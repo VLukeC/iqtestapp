@@ -33,7 +33,5 @@ def gemini_api_call(length):
 
     return result
 
-
-
-
-
+@app.route('/results', methods=['GET'])
+def grade_quiz():
