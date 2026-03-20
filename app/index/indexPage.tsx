@@ -1,8 +1,10 @@
 import { Link } from "react-router";
 import "../styles/styles.css";
 
-// TODO: add conditonal that checks if user in logged in before displaying account
+// TODO: add conditional that checks if user is logged in before displaying account
 export function IndexPage() {
+    // const resultsPageTestingData = { iqScore: 100, correctAnswerCount: 22, totalQuestionCount: 25, explanationText: "Explanation text." }
+
     return (
         <main>
             <div className="navBar">
@@ -11,6 +13,7 @@ export function IndexPage() {
                     <Link to='/account' className="navButton">Account</Link>
                     <Link to='/login' className="navButton">Login/Register</Link>
                     <Link to='/quiz' className="navButton">Take Quiz</Link>
+                    {/*<Link to='/results' className="navButton" state={resultsPageTestingData}>Results Testing</Link>*/}
                 </>
             </div>
             <div>
