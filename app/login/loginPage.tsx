@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -51,8 +51,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      
+  <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+
+    {/* 🔹 NAVBAR stays at top */}
+    <div className="navBar">
+      <Link to="/" className="navButton">Home</Link>
+      <Link to="/login" className="navButton">Login/Register</Link>
+    </div>
+
+    {/* 🔹 Centered login card BELOW navbar */}
+    <div className="flex justify-center items-center mt-20">
       <div className="bg-slate-800/80 backdrop-blur-xl p-10 rounded-2xl shadow-2xl w-96 border border-slate-700">
         
         <h1 className="text-3xl font-bold text-white text-center mb-8">
@@ -63,14 +71,14 @@ export default function LoginPage() {
           <input
             type="email"
             placeholder="Email"
-            className="w-full p-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:ring-offset-slate-800 transition"
+            className="w-full p-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             onChange={(e) => setEmail(e.target.value)}
           />
 
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:ring-offset-slate-800 transition"
+            className="w-full p-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
@@ -92,9 +100,10 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-gray-400 text-sm mt-6">
-          Start testing your IQ 🚀
+          Start testing your IQ
         </p>
       </div>
     </div>
-  );
+  </main>
+);
 }
