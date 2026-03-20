@@ -51,27 +51,50 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h1>Login</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      
+      <div className="bg-slate-800/80 backdrop-blur-xl p-10 rounded-2xl shadow-2xl w-96 border border-slate-700">
+        
+        <h1 className="text-3xl font-bold text-white text-center mb-8">
+          Welcome Back
+        </h1>
 
-      <input
-        type="email"
-        placeholder="Email"
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <div className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full p-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:ring-offset-slate-800 transition"
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-      <br />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full p-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:ring-offset-slate-800 transition"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <div className="mt-6 space-y-3">
+          <button
+            onClick={handleLogin}
+            className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white py-3 rounded-lg font-semibold shadow-lg"
+          >
+            Login
+          </button>
 
-      <br />
+          <button
+            onClick={handleSignup}
+            className="w-full bg-slate-600 hover:bg-slate-500 active:scale-95 transition text-white py-3 rounded-lg font-semibold"
+          >
+            Create Account
+          </button>
+        </div>
 
-      <button onClick={handleLogin}>Login</button>
-      <button onClick={handleSignup}>Sign Up</button>
+        <p className="text-center text-gray-400 text-sm mt-6">
+          Start testing your IQ 🚀
+        </p>
+      </div>
     </div>
   );
 }
