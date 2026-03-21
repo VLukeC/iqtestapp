@@ -1,37 +1,37 @@
-from flask import Flask
+# api.py
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from dotenv import load_dotenv
+from models import GradeRequest
+from gemini import generate_questions, grade_questions
 
-from google import genai
-from ppydantic import BaseModel, Field
+load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
-class Question(BaseModel):
-    question: str = Field('Question to be asked.')
-    answer: str = Field('Answer to the question.')
 
-class QuestionList(BaseModel):
-    questionList: List[Question]
-
-@app.route('/quiz/<length>', methods=['GET'])
+@app.route('/quiz/<int:length>', methods=['GET'])
 def gemini_api_call(length):
-    
-    gemini = genai.Client()
+    """
+    Generate an IQ test with `length` multiple-choice questions.
+    Example: GET /quiz/10
+    """
+    result = generate_questions(length)
+    return jsonify(result.model_dump())
 
-    prompt = f"""
-    Please create a {length} question IQ test. The test must provide multiple choice answers, and must be accurate to a real IQ test.
-"""
-    response = gemini.models.generate_content(
-        model='gemini-3-flash-preview',
-        contents=prompt,
-        config={
-            "response_mime_type": "applications/json"
-            "response_json_schema": QuestionList.model_json_schema(),
-        },
-    )
 
-    result = QuestionList.model_validate_json(response.text)
-
-    return result
-
-@app.route('/results', methods=['GET'])
+@app.route('/results', methods=['POST'])
 def grade_quiz():
+    """
+    Grade the quiz and return an IQ score + explanation.
+    Example: POST /results
+    """
+    body = request.get_json(force=True)
+    grade_request = GradeRequest.model_validate(body)
+    result = grade_questions(grade_request)
+    return jsonify(result.model_dump())
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
