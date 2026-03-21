@@ -1,12 +1,22 @@
 import "../styles/styles.css";
 
 import { useState } from 'react';
-import type { ChangeEvent, SubmitEvent } from "react";
+import type { ChangeEvent } from "react";
+import { useNavigate } from "react-router";
 
 import type {Question} from './Question';
 
+type QuizQuestionProps = {
+    question: Question;
+    onNext: () => void;
+    onPrevious: () => void;
+    onSubmit: () => void;
+    hasNext: boolean;
+    hasPrevious: boolean;
+}
 
-export function QuizQuestion({ statement, answers}: Question) {
+export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious, onSubmit}: QuizQuestionProps) {
+    const navigate = useNavigate()
 
     const [selectedValue, setSelectedValue] = useState('a');
 
@@ -14,38 +24,50 @@ export function QuizQuestion({ statement, answers}: Question) {
         setSelectedValue(event.target.value);
     }
 
-    const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
-        alert(`Are you sure you want to enter ${selectedValue}?`)
-        event.preventDefault();
-        //ADD HERE
+    const handleNext = () => {
+        if (selectedValue === question.correctAnswer) {
+            question.correctQuestion = true;
+        } else {
+            question.correctQuestion = false;
+        }
+        onNext();
     }
 
     return (
         <div className="quizQuestion">
             <div>
-                    {statement}
+                    <p>{question.statement}</p><br/>
             </div>
             <div>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={() => {
+                    if (selectedValue === question.correctAnswer) {
+                        question.correctQuestion = true;
+                    } else {
+                        question.correctQuestion = false;
+                    }
+                    window.confirm("Are you finished with your quiz?");
+                    onSubmit();
+                }}>
                     <legend>Select one of the following answers:</legend>
                     <label>
-                    <input type="radio" id="a" name="a" value="a"
-                    checked={selectedValue === 'a'} onChange={handleChange}/>{answers[0]}
+                    <input type="radio" id="a" name="a" value={question.answers[0]}
+                    checked={selectedValue === question.answers[0]} onChange={handleChange}/>{question.answers[0]}
                     </label><br/>
                     <label>
-                    <input type="radio" id="b" name="b" value="b"
-                     checked={selectedValue === 'b'} onChange={handleChange}/>{answers[1]}
+                    <input type="radio" id="b" name="b" value={question.answers[1]}
+                     checked={selectedValue === question.answers[1]} onChange={handleChange}/>{question.answers[1]}
                     </label><br/>
                     <label>
-                    <input type="radio" id="c" name="c" value="c"
-                     checked={selectedValue === 'c'} onChange={handleChange}/>{answers[2]}
+                    <input type="radio" id="c" name="c" value={question.answers[2]}
+                     checked={selectedValue === question.answers[2]} onChange={handleChange}/>{question.answers[2]}
                     </label><br/>
                     <label>
-                    <input type="radio" id="d" name="d" value="d"
-                     checked={selectedValue === 'd'} onChange={handleChange}/>{answers[3]}
+                    <input type="radio" id="d" name="d" value={question.answers[3]}
+                     checked={selectedValue === question.answers[3]} onChange={handleChange}/>{question.answers[3]}
                     </label><br/>
-
-                    <button type="submit">Submit</button>
+                    {hasPrevious && <button onClick={onPrevious}>Previous Question</button>}
+                    {hasNext && <button type="button" onClick={handleNext}>Next Question</button>}
+                    {!hasNext && <button type="submit">Submit Quiz</button>}
                 </form>
             </div>
         </div>
