@@ -39,13 +39,14 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
                     <p>{question.statement}</p><br/>
             </div>
             <div>
-                <form onSubmit={() => {
+                <form onSubmit={(event) => {
                     if (selectedValue === question.correctAnswer) {
                         question.correctQuestion = true;
                     } else {
                         question.correctQuestion = false;
                     }
                     window.confirm("Are you finished with your quiz?");
+                    event.preventDefault();
                     onSubmit();
                 }}>
                     <legend>Select one of the following answers:</legend>
