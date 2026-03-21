@@ -25,3 +25,14 @@ color pallete?:
     justify-content: Center;
     overflow: hidden
 }
+
+.quizQuestion {
+    display: flex;
+    margin-left: 30%;
+    margin-right: 30%;
+    background: #214f4b;
+    justify-content: Center;
+    overflow: wrap;
+    color:white;
+}
+
