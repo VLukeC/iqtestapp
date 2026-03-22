@@ -98,7 +98,9 @@ export function AccountPage() {
                 <Link to="/" className="text-white font-semibold text-lg">
                 IQ Test App
                 </Link>
-                <Link to='/' className="text-white font-semibold text-lg">Home</Link>
+                <div className="flex gap-6">
+                    <Link to='/' className="text-gray-300 hover:text-white transition">Home</Link>
+                </div>
             </div>
 
             <h1 className="text-center text-5xl font-bold mb-15 mt-10">
