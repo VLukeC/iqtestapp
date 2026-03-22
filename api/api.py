@@ -11,7 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/quiz/<int:length>', methods=['GET'])
+@app.route('/api/quiz/<int:length>', methods=['GET'])
 def gemini_api_call(length):
     """
     Generate an IQ test with `length` multiple-choice questions.

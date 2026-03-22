@@ -1,0 +1,48 @@
+/*
+color pallete?:
+#2de1fc - electric aqua
+#2afc98 - spring green (light green)
+#09e85e - malachite (green)
+#16c172 - emerald (darker green)
+#214f4b - dark slate gray (blueish gray)
+*/
+
+.navButton {
+    padding: 10px 8px ;
+    border-left: 2px solid #0f2422;
+    color: #ffffffd7;
+}
+
+.navButton:last-child{
+    border-right: 2px solid #0f2422
+}
+
+.navBar {
+    display: flex; 
+    gap: 0; 
+    background: #214f4b; 
+    border-top: 3px solid #161212;
+    justify-content: Center;
+    overflow: hidden
+}
+
+.quizQuestion {
+    display: flex;
+    margin-left: 30%;
+    margin-right: 30%;
+    background: #214f4b;
+    justify-content: Center;
+    overflow: wrap;
+    color:white;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px #334155 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  border-radius: 0.5rem;
+  transition: background-color 9999s ease-in-out 0s;
+}
