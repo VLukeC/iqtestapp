@@ -14,6 +14,7 @@ interface ResultProps {
 export function ResultsPage({ iqScore, correctAnswerCount, totalQuestionCount, explanationText }: ResultProps) {
     const [saveMessage, setSaveMessage] = useState("Save pending.");
     const hasAttemptedSave = useRef(false);
+    const scorePercent = Math.round((correctAnswerCount / totalQuestionCount) * 100);
 
     useEffect(() => {
         const persistResult = async () => {
@@ -61,20 +62,26 @@ export function ResultsPage({ iqScore, correctAnswerCount, totalQuestionCount, e
                 </div>
             </div>
 
-            <div>
-                <h1 className="text-5xl font-bold text-center mt-20">
+            <section className="mx-auto mt-16 max-w-3xl rounded-3xl border border-slate-700 bg-slate-900/60 px-8 py-10 text-center shadow-2xl">
+                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+                    Quiz Summary
+                </p>
+                <h1 className="text-5xl font-bold text-center mt-6">
                     IQ Score: {iqScore}
                 </h1>
                 <h2 className="text-3xl font-bold text-center mt-10">
                     Test Score: {correctAnswerCount}/{totalQuestionCount}
                 </h2>
-                <p className="text-center mt-20">
+                <p className="mt-4 text-slate-300">
+                    Accuracy: {scorePercent}%
+                </p>
+                <p className="mx-auto mt-10 max-w-2xl text-center leading-7 text-slate-200">
                     {explanationText}
                 </p>
                 <p className="text-center mt-6 text-sm text-gray-500">
                     {saveMessage}
                 </p>
-            </div>
+            </section>
 
             <div className="flex justify-center items-center mt-20">
                 <Link to="/">

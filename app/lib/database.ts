@@ -13,6 +13,11 @@ export interface QuizResultInput {
     explanationText: string;
 }
 
+export interface QuizResultRecord extends QuizResultInput {
+    id: string;
+    createdAt: string;
+}
+
 const defaultPreferences: UserPreferences = {
     preferredQuestionCount: 10,
     preferredCategory: "mixed",
@@ -99,4 +104,25 @@ export async function saveQuizResult(userId: string, result: QuizResultInput) {
     if (error) {
         throw error;
     }
+}
+
+export async function getQuizResults(userId: string): Promise<QuizResultRecord[]> {
+    const { data, error } = await supabase
+        .from("quiz_results")
+        .select("id, iq_score, correct_answer_count, total_question_count, explanation_text, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        throw error;
+    }
+
+    return (data ?? []).map((row) => ({
+        id: row.id,
+        iqScore: row.iq_score,
+        correctAnswerCount: row.correct_answer_count,
+        totalQuestionCount: row.total_question_count,
+        explanationText: row.explanation_text,
+        createdAt: row.created_at,
+    }));
 }
