@@ -36,3 +36,13 @@ color pallete?:
     color:white;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #334155 inset !important; 
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  border-radius: 0.5rem;
+  transition: background-color 9999s ease-in-out 0s;
+}
