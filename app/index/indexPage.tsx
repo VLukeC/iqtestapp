@@ -1,21 +1,22 @@
 import { Link, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import "../styles/styles.css";
 import { supabase } from "../supabase";
 
 export function IndexPage() {
     const navigate = useNavigate();
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         const session = supabase.auth.getSession();
 
-        session.then(({ data }) => {
+        session.then(({ data }: { data: { session: Session | null } }) => {
             setUser(data.session?.user ?? null);
         });
 
         const { data: listener } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
+            (_event: AuthChangeEvent, session: Session | null) => {
                 setUser(session?.user ?? null);
             }
         );
