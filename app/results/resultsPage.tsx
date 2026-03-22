@@ -10,11 +10,14 @@ interface ResultProps {
 
 export function ResultsPage({ iqScore, correctAnswerCount, totalQuestionCount, explanationText }: ResultProps) {
     return (
-        <main>
+        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
             <div className="navBar">
-                <>
-                    <Link to='/' className='navButton'>Home</Link>
-                </>
+                <Link to="/" className="text-white font-semibold text-lg">
+                IQ Test App
+                </Link>
+                <div className="flex gap-6">
+                    <Link to='/' className="text-gray-300 hover:text-white transition">Home</Link>
+                </div>
             </div>
 
             <div>

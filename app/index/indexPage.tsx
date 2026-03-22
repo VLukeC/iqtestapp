@@ -37,20 +37,25 @@ export function IndexPage() {
     };
 
     return (
-        <main>
-            <div className="navBar">
-                <Link to="/history" className="navButton">History</Link>
-                <Link to="/quiz" className="navButton">Take Quiz</Link>
-                {user && <Link to="/account" className="navButton">Account</Link>}
-                {user ? (
-                    <button onClick={handleLogout} className="navButton">
+        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+            <div className="flex justify-between items-center px-8 py-4">
+                <Link to="/" className="text-white font-semibold text-lg">
+                IQ Test App
+                </Link>
+                <div className="flex gap-6">
+                    <Link to="/history" className="text-gray-300 hover:text-white transition">History</Link>
+                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">Take Quiz</Link>
+                    {user && <Link to="/account" className="text-gray-300 hover:text-white transition">Account</Link>}
+                    {user ? (
+                    <button onClick={handleLogout} className="text-gray-300 hover:text-white transition cursor-pointer">
                         Logout
                     </button>
-                ) : (
-                    <Link to="/login" className="navButton">
+                    ) : (
+                    <Link to="/login" className="text-gray-300 hover:text-white transition">
                         Login/Register
                     </Link>
                 )}
+                </div>
             </div>
 
             <div>
