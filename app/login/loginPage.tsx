@@ -36,30 +36,25 @@ export default function LoginPage() {
 
     navigate("/"); 
   };
-  const handleSignup = async () => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    console.log("Signed up:", data.user);
-  };
 
   return (
   <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
 
-    {/* 🔹 NAVBAR stays at top */}
-    <div className="navBar">
-      <Link to="/" className="navButton">Home</Link>
-      <Link to="/login" className="navButton">Login/Register</Link>
+    <div className="flex justify-between items-center px-8 py-4">
+      <Link to="/" className="text-white font-semibold text-lg">
+        IQ Test App
+      </Link>
+      <div className="flex gap-6">
+        <Link to="/" className="text-gray-300 hover:text-white transition">
+          Home
+        </Link>
+        <Link to="/signup" className="text-gray-300 hover:text-white transition">
+          Signup
+        </Link>
+      </div>
     </div>
 
-    {/* 🔹 Centered login card BELOW navbar */}
     <div className="flex justify-center items-center mt-20">
       <div className="bg-slate-800/80 backdrop-blur-xl p-10 rounded-2xl shadow-2xl w-96 border border-slate-700">
         
@@ -91,12 +86,12 @@ export default function LoginPage() {
             Login
           </button>
 
-          <button
-            onClick={handleSignup}
-            className="w-full bg-slate-600 hover:bg-slate-500 active:scale-95 transition text-white py-3 rounded-lg font-semibold"
-          >
-            Create Account
-          </button>
+          <p className="text-center text-gray-400 text-sm mt-6">
+            Don’t have an account?{" "}
+            <Link to="/signup" className="text-blue-400 hover:underline">
+              Sign up
+            </Link>
+          </p>
         </div>
 
         <p className="text-center text-gray-400 text-sm mt-6">
