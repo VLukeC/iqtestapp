@@ -1,13 +1,26 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { supabase } from "../supabase";
+import {
+    getUserPreferences,
+    updateUserPreferences,
+    type UserPreferences,
+} from "../lib/database";
 
+const defaultPreferences: UserPreferences = {
+    preferredQuestionCount: 10,
+    preferredCategory: "mixed",
+    preferredTimeLimitSeconds: 900,
+};
 
 export function AccountPage() {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
     const [popupType, setPopupType] = useState("Email");
     const [popupOpen, setPopupOpen] = useState(false);
     const [popupText, setPopupText] = useState("");
+    const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+    const [preferencesLoading, setPreferencesLoading] = useState(true);
+    const [preferencesSaving, setPreferencesSaving] = useState(false);
     const navigate = useNavigate();
 
     const initUser = async () => {
@@ -17,7 +30,20 @@ export function AccountPage() {
             navigate("/");
         }
         else {
-            setUser(user);
+            setUser({ id: user.id, email: user.email });
+            try {
+                const loadedPreferences = await getUserPreferences(user.id);
+                setPreferences(loadedPreferences);
+            }
+            catch (preferencesError) {
+                const message = preferencesError instanceof Error
+                    ? preferencesError.message
+                    : "Failed to load user preferences.";
+                alert(message);
+            }
+            finally {
+                setPreferencesLoading(false);
+            }
         }
 
     }
@@ -86,6 +112,28 @@ export function AccountPage() {
 
     const deleteAccount = () => {
         // Needs external support (might not be implemented)
+    }
+
+    const savePreferences = async () => {
+        if (!user) {
+            return;
+        }
+
+        setPreferencesSaving(true);
+
+        try {
+            await updateUserPreferences(user.id, preferences);
+            alert("Preferences saved.");
+        }
+        catch (preferencesError) {
+            const message = preferencesError instanceof Error
+                ? preferencesError.message
+                : "Failed to save preferences.";
+            alert(message);
+        }
+        finally {
+            setPreferencesSaving(false);
+        }
     }
 
     useEffect(() => {
@@ -158,6 +206,73 @@ export function AccountPage() {
                         </button>
                     </div>
                 }
+
+                <div className="flex flex-col w-full max-w-md rounded-xl border border-gray-200 mx-5 px-5 py-5">
+                    <h2 className="text-2xl font-bold mb-4">Quiz Preferences</h2>
+                    <label className="mb-3">
+                        <span className="block mb-2 font-semibold">Preferred question count</span>
+                        <input
+                            type="number"
+                            min={5}
+                            max={50}
+                            className="w-full border p-2 rounded"
+                            value={preferences.preferredQuestionCount}
+                            disabled={preferencesLoading || preferencesSaving}
+                            onChange={(e) =>
+                                setPreferences((current) => ({
+                                    ...current,
+                                    preferredQuestionCount: Number(e.target.value),
+                                }))
+                            }
+                        />
+                    </label>
+                    <label className="mb-3">
+                        <span className="block mb-2 font-semibold">Preferred category</span>
+                        <select
+                            className="w-full border p-2 rounded"
+                            value={preferences.preferredCategory}
+                            disabled={preferencesLoading || preferencesSaving}
+                            onChange={(e) =>
+                                setPreferences((current) => ({
+                                    ...current,
+                                    preferredCategory: e.target.value,
+                                }))
+                            }
+                        >
+                            <option value="mixed">Mixed</option>
+                            <option value="logic">Logic</option>
+                            <option value="numerical">Numerical</option>
+                            <option value="verbal">Verbal</option>
+                            <option value="spatial">Spatial</option>
+                        </select>
+                    </label>
+                    <label className="mb-4">
+                        <span className="block mb-2 font-semibold">Preferred time limit (seconds)</span>
+                        <input
+                            type="number"
+                            min={60}
+                            max={7200}
+                            step={60}
+                            className="w-full border p-2 rounded"
+                            value={preferences.preferredTimeLimitSeconds}
+                            disabled={preferencesLoading || preferencesSaving}
+                            onChange={(e) =>
+                                setPreferences((current) => ({
+                                    ...current,
+                                    preferredTimeLimitSeconds: Number(e.target.value),
+                                }))
+                            }
+                        />
+                    </label>
+                    <button
+                        type="button"
+                        className="bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white rounded-lg font-semibold shadow-lg px-4 py-2 disabled:opacity-60"
+                        disabled={preferencesLoading || preferencesSaving}
+                        onClick={savePreferences}
+                    >
+                        {preferencesLoading ? "Loading..." : preferencesSaving ? "Saving..." : "Save Preferences"}
+                    </button>
+                </div>
             </div>
 
 

@@ -1,5 +1,8 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import "../styles/styles.css";
+import { supabase } from "../supabase";
+import { saveQuizResult } from "../lib/database";
 
 interface ResultProps {
     iqScore: number;
@@ -9,6 +12,44 @@ interface ResultProps {
 }
 
 export function ResultsPage({ iqScore, correctAnswerCount, totalQuestionCount, explanationText }: ResultProps) {
+    const [saveMessage, setSaveMessage] = useState("Save pending.");
+    const hasAttemptedSave = useRef(false);
+
+    useEffect(() => {
+        const persistResult = async () => {
+            if (hasAttemptedSave.current) {
+                return;
+            }
+
+            hasAttemptedSave.current = true;
+
+            const { data, error } = await supabase.auth.getUser();
+
+            if (error || !data.user) {
+                setSaveMessage("Log in to save this result.");
+                return;
+            }
+
+            try {
+                await saveQuizResult(data.user.id, {
+                    iqScore,
+                    correctAnswerCount,
+                    totalQuestionCount,
+                    explanationText,
+                });
+                setSaveMessage("Result saved to your account.");
+            }
+            catch (saveError) {
+                const message = saveError instanceof Error
+                    ? saveError.message
+                    : "Failed to save result.";
+                setSaveMessage(message);
+            }
+        };
+
+        persistResult();
+    }, [correctAnswerCount, explanationText, iqScore, totalQuestionCount]);
+
     return (
         <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
             <div className="navBar">
@@ -29,6 +70,9 @@ export function ResultsPage({ iqScore, correctAnswerCount, totalQuestionCount, e
                 </h2>
                 <p className="text-center mt-20">
                     {explanationText}
+                </p>
+                <p className="text-center mt-6 text-sm text-gray-500">
+                    {saveMessage}
                 </p>
             </div>
 
