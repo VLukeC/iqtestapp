@@ -8,8 +8,6 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [name, setName] = useState("");
-  const [age, setAge] = useState("");
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,7 +45,6 @@ export default function SignupPage() {
     }
 
     console.log("User:", data.user);
-    console.log("Name:", name, "Age:", age);
 
     navigate("/login");
   };
@@ -84,19 +81,6 @@ export default function SignupPage() {
 
           <div className="space-y-4">
 
-            <input
-              type="text"
-              placeholder="Name (optional)"
-              className="w-full p-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              onChange={(e) => setName(e.target.value)}
-            />
-
-            <input
-              type="number"
-              placeholder="Age (optional)"
-              className="w-full p-3 rounded-lg bg-slate-700 text-white placeholder-gray-400 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition appearance-none"
-              onChange={(e) => setAge(e.target.value)}
-            />
 
             <input
               type="email"
