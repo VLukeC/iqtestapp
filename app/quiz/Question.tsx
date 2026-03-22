@@ -1,6 +1,6 @@
 export interface Question{
-    statement: string,
-    answers: Array<string>,
-    correctAnswer: string,
-    correctQuestion: boolean
+    id: number,
+    question: string,
+    options: Array<string>,
+    answer: string
 }

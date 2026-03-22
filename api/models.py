@@ -5,10 +5,10 @@ from typing import List
 
 
 class Question(BaseModel):
-    id: int = Field(description="Question number starting at 1.")
+    id: int = Field(description="The id number of the question to be asked, id numbers start at 0.")
     question: str = Field(description="The IQ test question to be asked.")
     options: List[str] = Field(description="Exactly 4 multiple choice options.")
-    answer: str = Field(description="The correct option: 'A', 'B', 'C', or 'D'.")
+    answer: str = Field(description="The correct option: 'A', 'B', 'C', or 'D', including the entire question")
 
 
 class QuestionList(BaseModel):
@@ -17,7 +17,7 @@ class QuestionList(BaseModel):
 
 class UserAnswer(BaseModel):
     id: int = Field(description="The question id this answer corresponds to.")
-    selected: str = Field(description="The option the user selected: 'A', 'B', 'C', or 'D'.")
+    selected: str = Field(description="The option the user selected: 'A', 'B', 'C', or 'D', including the entire")
 
 
 class GradeRequest(BaseModel):

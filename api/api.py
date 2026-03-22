@@ -11,17 +11,19 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/quiz/<int:length>', methods=['GET'])
+@app.route('/api/quiz/<int:length>', methods=['GET'])
 def gemini_api_call(length):
     """
     Generate an IQ test with `length` multiple-choice questions.
     Example: GET /quiz/10
     """
+    print("Obtaining quiz questions...")
     result = generate_questions(length)
+    print(result)
     return jsonify(result.model_dump())
 
 
-@app.route('/results', methods=['POST'])
+@app.route('/api/results', methods=['POST'])
 def grade_quiz():
     """
     Grade the quiz and return an IQ score + explanation.
