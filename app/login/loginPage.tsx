@@ -7,6 +7,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     const checkUser = async () => {
@@ -21,6 +23,7 @@ export default function LoginPage() {
   }, []);
 
   const handleLogin = async () => {
+    setError("");
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -29,13 +32,33 @@ export default function LoginPage() {
     console.log("LOGIN RESULT:", { data, error });
 
     if (error) {
-      alert(error.message);
+      setError(error.message);
       return;
     }
 
-    alert("Logged in!");
 
     navigate("/"); 
+  };
+
+  const handleForgotPassword = async () => {
+    setError("");
+    setMessage("");
+
+    if (!email) {
+      setError("Enter your email first.");
+      return;
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "http://localhost:5173/reset-password",
+      // TODO: Change URL to real hosting
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setMessage("Check your email for the reset link.");
+    }
   };
 
 
@@ -94,10 +117,27 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
+        {error && (
+          <p className="text-center text-red-400 text-sm mt-3">
+            {error}
+          </p>
+        )}
 
+        {message && (
+          <p className="text-center text-green-400 text-sm mt-2">
+            {message}
+          </p>
+        )}
         <p className="text-center text-gray-400 text-sm mt-6">
           Start testing your IQ
         </p>
+        <div className="flex justify-center mt-2">
+          <button
+            onClick={handleForgotPassword}
+            className="text-blue-400 text-sm hover:underline cursor-pointer">
+            Forgot Password?
+          </button>
+        </div>
       </div>
     </div>
   </main>
