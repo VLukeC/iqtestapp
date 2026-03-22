@@ -3,14 +3,36 @@
 from google import genai
 from models import Question, QuestionList, GradeRequest, GradeResult
 
+# valid categories for IQ test questions
+VALID_CATEGORIES = [
+    "Logical Reasoning",
+    "Numerical Sequences",
+    "Pattern Recognition",
+    "Spatial Thinking",
+    "Word Analogies",
+    "Mixed",
+]
 
-def generate_questions(length: int) -> QuestionList:
+
+def generate_questions(length: int, category: str = "Mixed") -> QuestionList:
     gemini = genai.Client()
 
+    # If Mixed, use all categories, otherwise focus on the selected one
+    if category == "Mixed":
+        category_instruction = (
+            "Questions must cover a mix of logical reasoning, pattern recognition, "
+            "numerical sequences, spatial thinking, and word analogies."
+        )
+    else:
+        category_instruction = (
+            f"All questions must be from the category: {category}. "
+            f"Every single question must strictly focus on {category} only."
+        )
+
     prompt = f"""
-    Create a {length} question IQ test. Questions must cover logical reasoning,
-    pattern recognition, numerical sequences, and spatial thinking — the same
-    categories found in real standardised IQ tests.
+    Create a {length} question IQ test.
+    {category_instruction}
+    Questions must be the same style as those found in real standardised IQ tests.
     Each question must have exactly 4 multiple choice options (A, B, C, D)
     and one correct answer.
     IMPORTANT: Every question must be fully self-contained as text only.
@@ -38,7 +60,7 @@ def grade_questions(grade_request: GradeRequest) -> GradeResult:
     # Build a lookup of user answers by question id
     user_answer_map = {ua.id: ua.selected for ua in grade_request.userAnswers}
 
-    # count correct
+    # correct count
     correct_count = sum(
         1 for q in grade_request.questions
         if user_answer_map.get(q.id, "").upper() == q.answer.upper()
