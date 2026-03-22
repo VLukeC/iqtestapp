@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../supabase";
 import { Link, useNavigate } from "react-router";
+import { initializeUserData } from "../lib/database";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -47,7 +48,21 @@ export default function LoginPage() {
       return;
     }
 
+    if (data.user) {
+      try {
+        await initializeUserData(data.user.id);
+      } catch (initializationError) {
+        const message =
+          initializationError instanceof Error
+            ? initializationError.message
+            : "Failed to initialize user data.";
+        alert(message);
+        return;
+      }
+    }
+
     console.log("Signed up:", data.user);
+    alert("Account created. Check your email if confirmation is required.");
   };
 
   return (
