@@ -26,6 +26,16 @@ color pallete?:
     overflow: hidden
 }
 
+.quizQuestion {
+    display: flex;
+    margin-left: 30%;
+    margin-right: 30%;
+    background: #214f4b;
+    justify-content: Center;
+    overflow: wrap;
+    color:white;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
