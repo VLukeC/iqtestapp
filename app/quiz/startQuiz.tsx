@@ -1,13 +1,56 @@
-import { useState } from "react"
-
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { supabase } from "../supabase";
+import {
+    getUserPreferences,
+    type UserPreferences,
+} from "../lib/database";
 
 interface StartQuizProps {
     handleSubmit: (quizLength: number) => void
 }
 
-export function StartQuiz({ handleSubmit }: StartQuizProps) {
-    const [ quizLength, setQuizLength ] = useState(20);
+const defaultPreferences: UserPreferences = {
+    preferredQuestionCount: 10,
+    preferredCategory: "mixed",
+    preferredTimeLimitSeconds: 900,
+};
 
+export function StartQuiz({ handleSubmit }: StartQuizProps) {
+    const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+    const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
+    const [preferencesLoading, setPreferencesLoading] = useState(true);
+    const navigate = useNavigate();
+
+    const initUser = async () => {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (!user) {
+            alert(error?.message);
+            navigate("/");
+        }
+        else {
+            setUser({ id: user.id, email: user.email });
+            try {
+                const loadedPreferences = await getUserPreferences(user.id);
+                setPreferences(loadedPreferences);
+                setQuizLength(loadedPreferences.preferredQuestionCount)
+            }
+            catch (preferencesError) {
+                const message = preferencesError instanceof Error
+                    ? preferencesError.message
+                    : "Failed to load user preferences.";
+                alert(message);
+            }
+            finally {
+                setPreferencesLoading(false);
+            }
+        }
+    }
+    const [ quizLength, setQuizLength ] = useState(defaultPreferences.preferredQuestionCount);
+    
+    useEffect(() => {
+        initUser()
+    }, [])
 
 
     return (
