@@ -26,6 +26,17 @@ color pallete?:
     overflow: hidden
 }
 
+select option {
+  background-color: #334155;
+  color: white;
+}
+
+select option:checked {
+  background-color: #3b82f6;
+  color: white;
+}
+
+
 .quizQuestion {
     display: flex;
     margin-left: 30%;
