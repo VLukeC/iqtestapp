@@ -48,7 +48,7 @@ def get_categories():
     return jsonify({"categories": VALID_CATEGORIES})
 
 
-@app.route('/results', methods=['POST'])
+@app.route('/api/results', methods=['POST'])
 def grade_quiz():
     """
     Grade the quiz and return an IQ score + explanation.
