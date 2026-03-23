@@ -23,6 +23,8 @@ class UserAnswer(BaseModel):
 class GradeRequest(BaseModel):
     questions: List[Question]
     userAnswers: List[UserAnswer]
+    timeTakenSeconds: int = Field(default=0, description="How long the user took in seconds.")
+    timeLimitSeconds: int = Field(default=0, description="The time limit they were given in seconds.")
 
 
 class GradeResult(BaseModel):
