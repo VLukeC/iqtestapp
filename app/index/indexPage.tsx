@@ -44,7 +44,7 @@ export function IndexPage() {
                 IQ Test App
                 </Link>
                 <div className="flex gap-6">
-                    <Link to="/history" className="text-gray-300 hover:text-white transition">History</Link>
+                    {user && (<Link to="/history" className="text-gray-300 hover:text-white transition">History</Link>)}
                     <Link to="/quiz" className="text-gray-300 hover:text-white transition">Take Quiz</Link>
                     {user && <Link to="/account" className="text-gray-300 hover:text-white transition">Account</Link>}
                     {user ? (
