@@ -7,7 +7,7 @@ import {
 } from "../lib/database";
 
 interface StartQuizProps {
-    handleSubmit: (quizLength: number) => void
+    handleSubmit: (quizLength: number, timeLimitSeconds: number) => void
 }
 
 const defaultPreferences: UserPreferences = {
@@ -67,7 +67,7 @@ export function StartQuiz({ handleSubmit }: StartQuizProps) {
             <form
                 onSubmit={(event) => {
                     event.preventDefault();
-                    handleSubmit(quizLength);
+                    handleSubmit(quizLength, preferences.preferredTimeLimitSeconds);
                 }}
                 className="w-full max-w-sm bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-lg space-y-6"
             >
