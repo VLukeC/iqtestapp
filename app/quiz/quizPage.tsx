@@ -16,6 +16,7 @@ export function QuizPage() {
     const [ lengthInputted, setLengthInputted ] = useState(false);
 
     const [ currentIndex, setCurrentIndex ] = useState(0);
+    const [ isSubmitting, setIsSubmitting ] = useState(false);
 
     const nextQuestion = (selectedQuestion: string) => {
         setAnswers((previousAnswers) => {
@@ -34,6 +35,7 @@ export function QuizPage() {
         setLengthInputted(true);
         setCurrentIndex(0);
         setAnswers([]);
+        setIsSubmitting(false);
 
         fetch(`http://localhost:5000/api/quiz/${quizLength}`)
         .then((results) => results.json())
@@ -42,6 +44,12 @@ export function QuizPage() {
     }
 
     const submitQuiz = (selectedQuestion: string) => {
+        if (isSubmitting) {
+            return;
+        }
+
+        setIsSubmitting(true);
+
         const finalAnswers = [...answers];
         finalAnswers[currentIndex] = selectedQuestion;
 
@@ -73,7 +81,8 @@ export function QuizPage() {
                 }
             });
         })
-        .catch((error) => console.error("Error obtaining results: ", error));
+        .catch((error) => console.error("Error obtaining results: ", error))
+        .finally(() => setIsSubmitting(false));
     }
 
     return (
@@ -110,6 +119,7 @@ export function QuizPage() {
                                 hasNext={currentIndex < questions.length - 1}
                                 hasPrevious={currentIndex > 0}
                                 selectedAnswer={answers[currentIndex] ?? ""}
+                                isSubmitting={isSubmitting}
                             />
                         </div>
 

@@ -13,9 +13,10 @@ interface QuizQuestionProps {
     hasNext: boolean;
     hasPrevious: boolean;
     selectedAnswer: string;
+    isSubmitting: boolean;
 }
 
-export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious, onSubmit, selectedAnswer}: QuizQuestionProps) {
+export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious, onSubmit, selectedAnswer, isSubmitting}: QuizQuestionProps) {
     const [selectedValue, setSelectedValue] = useState(selectedAnswer);
 
     useEffect(() => {
@@ -31,6 +32,10 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
     }
 
     const handleSubmit = () => {
+        if (isSubmitting) {
+            return;
+        }
+
         if (window.confirm("Are you finished with your quiz?")) {
             onSubmit(selectedValue);
         }
@@ -91,7 +96,7 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
                             <button
                                 type="button"
                                 onClick={handleNext}
-                                disabled={!selectedValue}
+                                disabled={!selectedValue || isSubmitting}
                                 className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition disabled:opacity-40"
                             >
                                 Next
@@ -100,10 +105,10 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
                             <button
                                 type="button"
                                 onClick={handleSubmit}
-                                disabled={!selectedValue}
+                                disabled={!selectedValue || isSubmitting}
                                 className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 transition disabled:opacity-40"
                             >
-                                Submit Quiz
+                                {isSubmitting ? "Submitting..." : "Submit Quiz"}
                             </button>
                         )}
                     </div>
