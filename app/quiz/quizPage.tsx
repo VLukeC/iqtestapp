@@ -50,21 +50,24 @@ export function QuizPage() {
 
         setIsSubmitting(true);
 
-        const finalAnswers = [...answers];
+        const finalAnswers = questions.map((_, index) => answers[index] ?? "");
         finalAnswers[currentIndex] = selectedQuestion;
+        setAnswers(finalAnswers);
+
+        const payload = {
+            questions,
+            userAnswers: questions.map((question, index) => ({
+                id: question.id,
+                selected: finalAnswers[index]
+            }))
+        };
 
         fetch('http://localhost:5000/api/results', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                questions: questions,
-                userAnswers: questions.map((question, index) => ({
-                    id: index,
-                    selected: finalAnswers[index] ?? ""
-                }))
-            })
+            body: JSON.stringify(payload)
         })
         .then((results) => results.json())
         .then((data) => {
@@ -111,7 +114,7 @@ export function QuizPage() {
                     {lengthInputted && questions.length > 0 ? (
                         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-lg">
                             <QuizQuestion
-                                key={questions[currentIndex].id ?? currentIndex}
+                                key={currentIndex}
                                 question={questions[currentIndex]}
                                 onNext={nextQuestion}
                                 onPrevious={prevQuestion}
