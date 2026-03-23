@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { supabase } from "../supabase";
 import {
@@ -13,6 +13,8 @@ const defaultPreferences: UserPreferences = {
     preferredTimeLimitSeconds: 900,
 };
 
+const categories = ["mixed", "logic", "numerical", "verbal", "spatial"];
+
 export function AccountPage() {
     const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
     const [popupType, setPopupType] = useState("Email");
@@ -21,6 +23,8 @@ export function AccountPage() {
     const [preferences, setPreferences] = useState<UserPreferences>(defaultPreferences);
     const [preferencesLoading, setPreferencesLoading] = useState(true);
     const [preferencesSaving, setPreferencesSaving] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false)
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
 
     const initUser = async () => {
@@ -110,6 +114,14 @@ export function AccountPage() {
         }
     }
 
+    const dropdownSelect = (e: React.MouseEvent<HTMLLIElement>, value: string) => {
+        setPreferences((current) => ({ ...current, preferredCategory: value }));
+
+        setTimeout(() => {
+            setDropdownOpen(false);
+        }, 10);
+    }
+
     const deleteAccount = () => {
         // Needs external support (might not be implemented)
     }
@@ -138,6 +150,15 @@ export function AccountPage() {
 
     useEffect(() => {
         initUser()
+
+        const collapseDropdownOnClick = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", collapseDropdownOnClick);
+        return () => document.removeEventListener("mousedown", collapseDropdownOnClick);
     }, [])
 
     return (
@@ -150,13 +171,13 @@ export function AccountPage() {
 
                 <div className="flex items-center gap-8 text-sm font-medium">
                     <Link to="/" className="text-gray-300 hover:text-white transition">Home</Link>
-                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">Take quiz</Link>
+                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">Take Quiz</Link>
                     <button
-                            onClick={logoutUser}
-                            className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition cursor-pointer"
-                        >
-                            Logout
-                        </button>
+                        onClick={logoutUser}
+                        className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition cursor-pointer"
+                    >
+                        Logout
+                    </button>
                 </div>
             </nav>
 
@@ -178,7 +199,13 @@ export function AccountPage() {
                     <div className="flex items-center justify-between py-3 border-b border-white/10">
                         <div>
                             <p className="text-sm text-slate-400">Email</p>
-                            <p className="font-medium">{user?.email}</p>
+                            <div>
+                                {user === null || user.email === null ? (
+                                    <p className="text-slate-500">Loading...</p>
+                                ) : (
+                                    <p className="font-medium">{user.email}</p>
+                                )}
+                            </div>
                         </div>
 
                         <button
@@ -232,23 +259,42 @@ export function AccountPage() {
                         <span className="block text-sm text-slate-400 mb-2">
                             Preferred category
                         </span>
-                        <select
-                            className="w-full bg-white/5 border border-white/10 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={preferences.preferredCategory}
-                            disabled={preferencesLoading || preferencesSaving}
-                            onChange={(e) =>
-                                setPreferences((current) => ({
-                                    ...current,
-                                    preferredCategory: e.target.value,
-                                }))
-                            }
-                        >
-                            <option value="mixed">Mixed</option>
-                            <option value="logic">Logic</option>
-                            <option value="numerical">Numerical</option>
-                            <option value="verbal">Verbal</option>
-                            <option value="spatial">Spatial</option>
-                        </select>
+                        <div className="relative w-full" ref={dropdownRef}>
+                            {/* Dropdown button */}
+                            <button
+                                type="button"
+                                disabled={preferencesLoading || preferencesSaving}
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                                className="w-full flex justify-between items-center bg-white/5 border border-white/10 p-3 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all"
+                            >
+                                <span className="capitalize">{preferencesLoading ? "Loading..." : preferences.preferredCategory}</span>
+                                <svg
+                                    className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            {/* Categories */}
+                            {dropdownOpen && (
+                                <ul className="absolute z-50 w-full mt-1 bg-gray-800/95 backdrop-blur-md 
+                                border border-white/20 rounded-lg shadow-2xl overflow-hidden 
+                                animate-in fade-in zoom-in duration-150">
+                                    {categories.map((cat) => (
+                                        <li
+                                            key={cat}
+                                            onClick={(e) => dropdownSelect(e, cat)}
+                                            className={`drop-shadow-md px-4 py-2 cursor-pointer capitalize text-sm transition-colors
+                ${preferences.preferredCategory === cat ? 'bg-blue-500/80 text-white' : 'text-gray-300 hover:bg-white/20'}
+              `}
+                                        >
+                                            {cat}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
                     </label>
 
                     <label className="block mb-6">
@@ -281,8 +327,8 @@ export function AccountPage() {
                         {preferencesLoading
                             ? "Loading..."
                             : preferencesSaving
-                            ? "Saving..."
-                            : "Save Preferences"}
+                                ? "Saving..."
+                                : "Save Preferences"}
                     </button>
                 </div>
             </div>

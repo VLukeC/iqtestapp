@@ -60,7 +60,7 @@ export function HistoryPage() {
                     <h1 className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                         Saved Results
                     </h1>
-                    <p className="text-slate-400 mt-4 max-w-xl">
+                    <p className="text-slate-400 mt-4 max-w-2xl">
                         Review your previous IQ test attempts and track your improvement over time.
                     </p>
                 </div>

@@ -9,6 +9,8 @@ export function IndexPage() {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
+        document.title = "IQ Test App";
+
         const session = supabase.auth.getSession();
 
         session.then(({ data }: { data: { session: Session | null } }) => {
@@ -37,10 +39,10 @@ export function IndexPage() {
         navigate("/");
     };
 
-   return (
+    return (
         <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
 
-            
+
             <nav className="flex justify-between items-center px-10 py-5 backdrop-blur-md bg-white/5 border-b border-white/10">
                 <Link to="/" className="text-xl font-bold tracking-wide hover:text-blue-400 transition">
                     IQ Test App
@@ -55,7 +57,7 @@ export function IndexPage() {
 
                     {user && <Link to="/quiz" className="text-gray-300 hover:text-white transition">
                         Take Quiz
-                    </Link>} 
+                    </Link>}
 
                     {user && (
                         <Link to="/account" className="text-gray-300 hover:text-white transition">
