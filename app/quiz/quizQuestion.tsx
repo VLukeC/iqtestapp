@@ -29,39 +29,85 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
     }
 
     return (
-        <div className="quizQuestion">
+        <div className="space-y-6">
+
             <div>
-                    <p>{question.question}</p><br/>
+                <p className="text-2xl font-semibold leading-relaxed">
+                    {question.question}
+                </p>
             </div>
-            <div>
-                <form onSubmit={(event) => {
+
+            <form
+                onSubmit={(event) => {
                     event.preventDefault();
-                    if(window.confirm("Are you finished with your quiz?")) {
+                    if (window.confirm("Are you finished with your quiz?")) {
                         onSubmit(selectedValue);
                     }
-                }}>
-                    <legend>Select one of the following answers:</legend>
-                    <label>
-                    <input type="radio" id="a" name="answer" value={question.options[0]}
-                    checked={selectedValue === question.options[0]} onChange={handleChange}/>{question.options[0]}
-                    </label><br/>
-                    <label>
-                    <input type="radio" id="b" name="answer" value={question.options[1]}
-                     checked={selectedValue === question.options[1]} onChange={handleChange}/>{question.options[1]}
-                    </label><br/>
-                    <label>
-                    <input type="radio" id="c" name="answer" value={question.options[2]}
-                     checked={selectedValue === question.options[2]} onChange={handleChange}/>{question.options[2]}
-                    </label><br/>
-                    <label>
-                    <input type="radio" id="d" name="answer" value={question.options[3]}
-                     checked={selectedValue === question.options[3]} onChange={handleChange}/>{question.options[3]}
-                    </label><br/>
-                    {hasPrevious && <button type="button" onClick={onPrevious}>Previous Question</button>}
-                    {hasNext && <button type="button" onClick={handleNext}>Next Question</button>}
-                    {!hasNext && <button type="submit">Submit Quiz</button>}
-                </form>
-            </div>
+                }}
+                className="space-y-4"
+            >
+                <p className="text-sm text-slate-400">
+                    Select one answer:
+                </p>
+
+                {question.options.map((option, index) => (
+                    <label
+                        key={index}
+                        className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition
+                        ${
+                            selectedValue === option
+                                ? "bg-blue-500/20 border-blue-500 text-white"
+                                : "bg-white/5 border-white/10 hover:bg-white/10"
+                        }`}
+                    >
+                        <input
+                            type="radio"
+                            name="answer"
+                            value={option}
+                            checked={selectedValue === option}
+                            onChange={handleChange}
+                            className="accent-blue-500"
+                        />
+                        <span>{option}</span>
+                    </label>
+                ))}
+
+                <div className="flex justify-between items-center pt-4">
+
+                    <div>
+                        {hasPrevious && (
+                            <button
+                                type="button"
+                                onClick={onPrevious}
+                                className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition"
+                            >
+                                Previous
+                            </button>
+                        )}
+                    </div>
+
+                    <div>
+                        {hasNext ? (
+                            <button
+                                type="button"
+                                onClick={handleNext}
+                                disabled={!selectedValue}
+                                className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition disabled:opacity-40"
+                            >
+                                Next
+                            </button>
+                        ) : (
+                            <button
+                                type="submit"
+                                disabled={!selectedValue}
+                                className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 transition disabled:opacity-40"
+                            >
+                                Submit Quiz
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </form>
         </div>
-    )
+);
 }

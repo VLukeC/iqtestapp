@@ -75,26 +75,51 @@ export function QuizPage() {
     }
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-            <div className="flex justify-between items-center px-8 py-4">
-                <Link to="/" className="text-white font-semibold text-lg">
-                IQ Test App
-                </Link>
-                 <div className="flex gap-6">
-                    <Link to='/' className="text-gray-300 hover:text-white transition">Home</Link>
+        <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+
+            <nav className="backdrop-blur-md bg-white/5 border-b border-white/10">
+                <div className="flex justify-between items-center max-w-6xl mx-auto px-6 py-4">
+                    <Link
+                        to="/"
+                        className="text-xl font-bold tracking-wide hover:text-blue-400 transition"
+                    >
+                        IQ Test App
+                    </Link>
+                    <div className="flex gap-6 text-sm font-medium">
+                        <Link to="/" className="text-gray-300 hover:text-white transition">
+                            Home
+                        </Link>
+                    </div>
+
                 </div>
-            </div>
-            <div className="quizArea">
-                {lengthInputted && questions.length > 0 ?
-                <QuizQuestion
-                    question={questions[currentIndex]}
-                    onNext={nextQuestion} onPrevious={prevQuestion} onSubmit={submitQuiz}
-                    hasNext={currentIndex < questions.length - 1} hasPrevious={currentIndex > 0}
-                /> : lengthInputted ? 
-                <p>Please Wait</p> :
-                <StartQuiz
-                    handleSubmit={startQuiz}
-                />}
+            </nav>
+
+            <div className="flex justify-center mt-16 px-4">
+                <div className="w-full max-w-3xl">
+
+                    {lengthInputted && questions.length > 0 ? (
+                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-lg">
+                            <QuizQuestion
+                                question={questions[currentIndex]}
+                                onNext={nextQuestion}
+                                onPrevious={prevQuestion}
+                                onSubmit={submitQuiz}
+                                hasNext={currentIndex < questions.length - 1}
+                                hasPrevious={currentIndex > 0}
+                            />
+                        </div>
+
+                    ) : lengthInputted ? (
+                        <div className="flex flex-col items-center mt-20 text-slate-400">
+                            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                            <p>Generating your quiz...</p>
+                        </div>
+
+                    ) : (
+                        <StartQuiz handleSubmit={startQuiz} />
+                    )}
+
+                </div>
             </div>
         </main>
     );

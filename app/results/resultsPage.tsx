@@ -52,45 +52,66 @@ export function ResultsPage({ iqScore, correctAnswerCount, totalQuestionCount, e
     }, [correctAnswerCount, explanationText, iqScore, totalQuestionCount]);
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-            <div className="navBar">
-                <Link to="/" className="text-white font-semibold text-lg">
-                IQ Test App
-                </Link>
-                <div className="flex gap-6">
-                    <Link to='/' className="text-gray-300 hover:text-white transition">Home</Link>
-                </div>
-            </div>
+        <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
 
-            <section className="mx-auto mt-16 max-w-3xl rounded-3xl border border-slate-700 bg-slate-900/60 px-8 py-10 text-center shadow-2xl">
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-400">
+            <nav className="flex justify-between items-center px-10 py-5 backdrop-blur-md bg-white/5 border-b border-white/10">
+                <Link to="/" className="text-xl font-bold tracking-wide hover:text-blue-400 transition">
+                    IQ Test App
+                </Link>
+
+                <div className="flex gap-8 text-sm font-medium">
+                    <Link to="/" className="text-gray-300 hover:text-white transition">
+                        Home
+                    </Link>
+                </div>
+            </nav>
+
+            <section className="mx-auto mt-20 max-w-3xl bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl px-8 py-12 shadow-2xl text-center">
+
+                <p className="text-xs uppercase tracking-widest text-slate-400">
                     Quiz Summary
                 </p>
-                <h1 className="text-5xl font-bold text-center mt-6">
-                    IQ Score: {iqScore}
+
+                <h1 className="text-5xl font-extrabold mt-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                    IQ {iqScore}
                 </h1>
-                <h2 className="text-3xl font-bold text-center mt-10">
-                    Test Score: {correctAnswerCount}/{totalQuestionCount}
-                </h2>
-                <p className="mt-4 text-slate-300">
-                    Accuracy: {scorePercent}%
-                </p>
-                <p className="mx-auto mt-10 max-w-2xl text-center leading-7 text-slate-200">
+
+                <div className="grid grid-cols-2 gap-6 mt-10">
+
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+                        <p className="text-sm text-slate-400">Score</p>
+                        <p className="text-2xl font-bold text-blue-400">
+                            {correctAnswerCount}/{totalQuestionCount}
+                        </p>
+                    </div>
+
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-5">
+                        <p className="text-sm text-slate-400">Accuracy</p>
+                        <p className="text-2xl font-bold text-purple-400">
+                            {scorePercent}%
+                        </p>
+                    </div>
+                </div>
+
+                <p className="mt-10 max-w-2xl mx-auto text-slate-300 leading-relaxed">
                     {explanationText}
                 </p>
-                <p className="text-center mt-6 text-sm text-gray-500">
-                    {saveMessage}
-                </p>
-            </section>
 
-            <div className="flex justify-center items-center mt-20">
-                <Link to="/">
-                    <button type="button" className="transition px-6 py-2 rounded-lg bg-[#214f4b] hover:bg-[#1a3f3c]">
-                        Finish
-                    </button>
-                </Link>
-            </div>
+                {saveMessage && (
+                    <p className="mt-6 text-sm text-green-400">
+                        {saveMessage}
+                    </p>
+                )}
+
+                <div className="mt-10">
+                    <Link to="/">
+                        <button className="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition font-semibold shadow-lg shadow-blue-600/30 active:scale-95">
+                            Back to Home
+                        </button>
+                    </Link>
+                </div>
+            </section>
         </main>
-    );
+);
 
 }

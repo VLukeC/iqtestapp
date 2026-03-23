@@ -37,37 +37,103 @@ export function IndexPage() {
         navigate("/");
     };
 
-    return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-            <div className="flex justify-between items-center px-8 py-4">
-                <Link to="/" className="text-white font-semibold text-lg">
-                IQ Test App
-                </Link>
-                <div className="flex gap-6">
-                    {user && (<Link to="/history" className="text-gray-300 hover:text-white transition">History</Link>)}
-                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">Take Quiz</Link>
-                    {user && <Link to="/account" className="text-gray-300 hover:text-white transition">Account</Link>}
-                    {user ? (
-                    <button onClick={handleLogout} className="text-gray-300 hover:text-white transition cursor-pointer">
-                        Logout
-                    </button>
-                    ) : (
-                    <Link to="/login" className="text-gray-300 hover:text-white transition">
-                        Login/Register
-                    </Link>
-                )}
-                </div>
-            </div>
+   return (
+        <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
 
-            <div>
-                <h1 className="text-5xl font-bold text-center mt-20">
+            
+            <nav className="flex justify-between items-center px-10 py-5 backdrop-blur-md bg-white/5 border-b border-white/10">
+                <Link to="/" className="text-xl font-bold tracking-wide hover:text-blue-400 transition">
                     IQ Test App
+                </Link>
+
+                <div className="flex items-center gap-8 text-sm font-medium">
+                    {user && (
+                        <Link to="/history" className="text-gray-300 hover:text-white transition">
+                            History
+                        </Link>
+                    )}
+
+                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">
+                        Take Quiz
+                    </Link>
+
+                    {user && (
+                        <Link to="/account" className="text-gray-300 hover:text-white transition">
+                            Account
+                        </Link>
+                    )}
+
+                    {user ? (
+                        <button
+                            onClick={handleLogout}
+                            className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition cursor-pointer"
+                        >
+                            Logout
+                        </button>
+                    ) : (
+                        <Link
+                            to="/login"
+                            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition"
+                        >
+                            Login
+                        </Link>
+                    )}
+                </div>
+            </nav>
+
+            <section className="flex flex-col items-center justify-center text-center px-6 mt-32">
+                <h1 className="text-6xl font-extrabold tracking-tight leading-tight bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                    Test Your Intelligence
                 </h1>
-                <p className="text-center mt-5">
-                    An LLM based web application for procedurally generating IQ tests,
-                    keeping track of test history, and more!
+
+                <p className="mt-6 text-lg text-gray-400 max-w-2xl">
+                    A smart, AI-powered IQ testing platform that generates unique challenges,
+                    tracks your performance, and helps you improve over time.
                 </p>
-            </div>
+
+                <div className="flex gap-4 mt-10">
+                    <Link
+                        to="/quiz"
+                        className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition font-semibold shadow-lg shadow-blue-600/30"
+                    >
+                        Start Quiz
+                    </Link>
+
+                    {!user && (
+                        <Link
+                            to="/login"
+                            className="px-6 py-3 rounded-xl border border-white/20 hover:bg-white/10 transition"
+                        >
+                            Create Account
+                        </Link>
+                    )}
+                </div>
+            </section>
+
+            <section className="mt-32 px-10 grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                {[
+                    {
+                        title: "AI Generated Tests",
+                        desc: "Every quiz is unique and adapts to your level.",
+                    },
+                    {
+                        title: "Track Progress",
+                        desc: "View your history and see improvement over time.",
+                    },
+                    {
+                        title: "Challenge Yourself",
+                        desc: "Push your limits with increasingly difficult questions.",
+                    },
+                ].map((item, i) => (
+                    <div
+                        key={i}
+                        className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:scale-105 transition"
+                    >
+                        <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                        <p className="text-gray-400 text-sm">{item.desc}</p>
+                    </div>
+                ))}
+            </section>
         </main>
     );
 }

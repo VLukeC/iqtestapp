@@ -141,81 +141,75 @@ export function AccountPage() {
     }, [])
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-            <div className="flex justify-between items-center px-8 py-4">
-                <Link to="/" className="text-white font-semibold text-lg">
-                IQ Test App
+        <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+
+            <nav className="flex justify-between items-center px-10 py-5 backdrop-blur-md bg-white/5 border-b border-white/10">
+                <Link to="/" className="text-xl font-bold tracking-wide hover:text-blue-400 transition">
+                    IQ Test App
                 </Link>
-                <div className="flex gap-6">
-                    <Link to='/' className="text-gray-300 hover:text-white transition">Home</Link>
+
+                <div className="flex gap-8 text-sm font-medium">
+                    <Link to="/" className="text-gray-300 hover:text-white transition">Home</Link>
                 </div>
+            </nav>
+
+            <div className="text-center mt-16">
+                <h1 className="text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+                    Account Settings
+                </h1>
+                <p className="text-slate-400 mt-3">
+                    Manage your account and personalize your quiz experience
+                </p>
             </div>
 
-            <h1 className="text-center text-5xl font-bold mb-15 mt-10">
-                Account Info
-            </h1>
+            <div className="flex flex-col items-center mt-12 px-6 gap-10">
 
-            {/* To center the box */}
-            <div className="flex flex-col w-full items-center justify-center">
-                {/* To create the column of items with a border */}
-                <div className="flex flex-col w-fit h-fit rounded-xl border border-gray-200 mx-5 px-5 mb-10">
-                    {/* Row */}
-                    <div className="flex w-full items-center space-x-3">
-                        {/* Email field */}
-                        <div className="flex items-center py-3 space-x-1">
-                            <span className="font-bold text-1xl">Email:</span>
-                            {user && <span>{user.email}</span>}
+                <div className="w-full max-w-md rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-6 shadow-lg">
+
+                    <h2 className="text-xl font-semibold mb-4">Account Info</h2>
+
+                    <div className="flex items-center justify-between py-3 border-b border-white/10">
+                        <div>
+                            <p className="text-sm text-slate-400">Email</p>
+                            <p className="font-medium">{user?.email}</p>
                         </div>
-                        {/* Change email button */}
-                        <div className="flex ml-auto">
-                            <button
-                                onClick={handleChangeEmail}
-                                className="min-w-12 h-fit bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white rounded-lg font-semibold shadow-lg px-2 py-1"
-                            >
-                                Edit
-                            </button>
-                        </div>
+
+                        <button
+                            onClick={handleChangeEmail}
+                            className="px-3 py-1 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500 hover:text-white transition"
+                        >
+                            Edit
+                        </button>
                     </div>
-                    {/* Row */}
-                    <div className="flex w-full items-center space-x-3">
-                        {/* Password field */}
-                        <div className="flex items-center py-3 space-x-1">
-                            <span className="font-bold text-1xl">Password:</span>
-                            {user && <span>●●●●●●</span>}
+
+                    <div className="flex items-center justify-between py-3">
+                        <div>
+                            <p className="text-sm text-slate-400">Password</p>
+                            <p className="font-medium">••••••••</p>
                         </div>
-                        {/* Change password button */}
-                        <div className="flex ml-auto">
-                            <button
-                                onClick={handleChangePassword}
-                                className="min-w-12 h-fit bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white rounded-lg font-semibold shadow-lg px-2 py-1"
-                            >
-                                Edit
-                            </button>
-                        </div>
+
+                        <button
+                            onClick={handleChangePassword}
+                            className="px-3 py-1 rounded-lg bg-blue-500/20 text-blue-300 hover:bg-blue-500 hover:text-white transition"
+                        >
+                            Edit
+                        </button>
                     </div>
                 </div>
 
-                {/* Delete account button */}
-                {false &&
-                    <div>
-                        <button
-                            className="min-w-12 h-fit bg-red-600 hover:bg-red-700 active:scale-95 transition text-white rounded-lg font-semibold shadow-lg px-2 py-1"
-                            onClick={() => deleteAccount()}
-                        >
-                            Delete Account
-                        </button>
-                    </div>
-                }
+                <div className="w-full max-w-md rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 p-6 shadow-lg">
 
-                <div className="flex flex-col w-full max-w-md rounded-xl border border-gray-200 mx-5 px-5 py-5">
-                    <h2 className="text-2xl font-bold mb-4">Quiz Preferences</h2>
-                    <label className="mb-3">
-                        <span className="block mb-2 font-semibold">Preferred question count</span>
+                    <h2 className="text-xl font-semibold mb-6">Quiz Preferences</h2>
+
+                    <label className="block mb-5">
+                        <span className="block text-sm text-slate-400 mb-2">
+                            Preferred question count
+                        </span>
                         <input
                             type="number"
                             min={5}
                             max={50}
-                            className="w-full border p-2 rounded"
+                            className="w-full bg-white/5 border border-white/10 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={preferences.preferredQuestionCount}
                             disabled={preferencesLoading || preferencesSaving}
                             onChange={(e) =>
@@ -226,10 +220,13 @@ export function AccountPage() {
                             }
                         />
                     </label>
-                    <label className="mb-3">
-                        <span className="block mb-2 font-semibold">Preferred category</span>
+
+                    <label className="block mb-5">
+                        <span className="block text-sm text-slate-400 mb-2">
+                            Preferred category
+                        </span>
                         <select
-                            className="w-full border p-2 rounded"
+                            className="w-full bg-white/5 border border-white/10 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={preferences.preferredCategory}
                             disabled={preferencesLoading || preferencesSaving}
                             onChange={(e) =>
@@ -246,14 +243,17 @@ export function AccountPage() {
                             <option value="spatial">Spatial</option>
                         </select>
                     </label>
-                    <label className="mb-4">
-                        <span className="block mb-2 font-semibold">Preferred time limit (seconds)</span>
+
+                    <label className="block mb-6">
+                        <span className="block text-sm text-slate-400 mb-2">
+                            Preferred time limit (seconds)
+                        </span>
                         <input
                             type="number"
                             min={60}
                             max={7200}
                             step={60}
-                            className="w-full border p-2 rounded"
+                            className="w-full bg-white/5 border border-white/10 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={preferences.preferredTimeLimitSeconds}
                             disabled={preferencesLoading || preferencesSaving}
                             onChange={(e) =>
@@ -264,35 +264,56 @@ export function AccountPage() {
                             }
                         />
                     </label>
+
                     <button
                         type="button"
-                        className="bg-blue-600 hover:bg-blue-700 active:scale-95 transition text-white rounded-lg font-semibold shadow-lg px-4 py-2 disabled:opacity-60"
+                        className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition font-semibold shadow-lg shadow-blue-600/30 disabled:opacity-60"
                         disabled={preferencesLoading || preferencesSaving}
                         onClick={savePreferences}
                     >
-                        {preferencesLoading ? "Loading..." : preferencesSaving ? "Saving..." : "Save Preferences"}
+                        {preferencesLoading
+                            ? "Loading..."
+                            : preferencesSaving
+                            ? "Saving..."
+                            : "Save Preferences"}
                     </button>
                 </div>
             </div>
 
-
-            {/* Popup */}
             {popupOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
-                    {/* Dim */}
-                    <div className="fixed w-screen h-screen z-40 inset=0 bg-black opacity-50" onClick={() => setPopupOpen(false)}></div>
 
-                    <div className="bg-grey p-6 rounded-xl shadow-2xl w-80 z-41">
-                        <h2 className="text-lg font-bold mb-4">Enter New {popupType}</h2>
+                    <div
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setPopupOpen(false)}
+                    ></div>
+
+                    <div className="relative bg-slate-900 border border-white/10 p-6 rounded-2xl shadow-2xl w-80 z-10">
+                        <h2 className="text-lg font-bold mb-4">
+                            Enter New {popupType}
+                        </h2>
+
                         <input
                             type={popupType === "Email" ? "text" : "password"}
-                            className="w-full border p-2 rounded mb-4 focus:outline-blue-500"
+                            className="w-full bg-white/5 border border-white/10 p-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             value={popupText}
                             onChange={(e) => setPopupText(e.target.value)}
                         />
-                        <div className="flex justify-center gap-2">
-                            <button onClick={() => setPopupOpen(false)} className="text-gray-500 px-3">Cancel</button>
-                            <button onClick={() => submitPopup()} className="bg-blue-600 text-white px-4 py-2 rounded-lg">Submit</button>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setPopupOpen(false)}
+                                className="text-slate-400 hover:text-white transition"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={submitPopup}
+                                className="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg"
+                            >
+                                Submit
+                            </button>
                         </div>
                     </div>
                 </div>
