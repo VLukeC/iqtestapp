@@ -101,7 +101,7 @@ export function IndexPage() {
 
                     {!user && (
                         <Link
-                            to="/login"
+                            to="/signup"
                             className="px-6 py-3 rounded-xl border border-white/20 hover:bg-white/10 transition"
                         >
                             Create Account
