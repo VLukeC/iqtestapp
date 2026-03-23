@@ -150,13 +150,13 @@ export function AccountPage() {
 
                 <div className="flex items-center gap-8 text-sm font-medium">
                     <Link to="/" className="text-gray-300 hover:text-white transition">Home</Link>
-                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">Take quiz</Link>
+                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">Take Quiz</Link>
                     <button
-                            onClick={logoutUser}
-                            className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition cursor-pointer"
-                        >
-                            Logout
-                        </button>
+                        onClick={logoutUser}
+                        className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition cursor-pointer"
+                    >
+                        Logout
+                    </button>
                 </div>
             </nav>
 
@@ -178,7 +178,13 @@ export function AccountPage() {
                     <div className="flex items-center justify-between py-3 border-b border-white/10">
                         <div>
                             <p className="text-sm text-slate-400">Email</p>
-                            <p className="font-medium">{user?.email}</p>
+                            <div>
+                                {user === null || user.email === null ? (
+                                    <p className="text-slate-500">Loading...</p>
+                                ) : (
+                                    <p className="font-medium">{user.email}</p>
+                                )}
+                            </div>
                         </div>
 
                         <button
@@ -281,8 +287,8 @@ export function AccountPage() {
                         {preferencesLoading
                             ? "Loading..."
                             : preferencesSaving
-                            ? "Saving..."
-                            : "Save Preferences"}
+                                ? "Saving..."
+                                : "Save Preferences"}
                     </button>
                 </div>
             </div>
