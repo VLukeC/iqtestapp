@@ -53,9 +53,9 @@ export function IndexPage() {
                         </Link>
                     )}
 
-                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">
+                    {user && <Link to="/quiz" className="text-gray-300 hover:text-white transition">
                         Take Quiz
-                    </Link>
+                    </Link>} 
 
                     {user && (
                         <Link to="/account" className="text-gray-300 hover:text-white transition">
@@ -88,16 +88,16 @@ export function IndexPage() {
 
                 <p className="mt-6 text-lg text-gray-400 max-w-2xl">
                     A smart, AI-powered IQ testing platform that generates unique challenges,
-                    tracks your performance, and helps you improve over time.
+                    tracks your performance, and helps you improve over time. Create an account to begin!
                 </p>
 
                 <div className="flex gap-4 mt-10">
-                    <Link
+                    {user && <Link
                         to="/quiz"
                         className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition font-semibold shadow-lg shadow-blue-600/30"
                     >
                         Start Quiz
-                    </Link>
+                    </Link>}
 
                     {!user && (
                         <Link
