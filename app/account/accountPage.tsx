@@ -148,8 +148,15 @@ export function AccountPage() {
                     IQ Test App
                 </Link>
 
-                <div className="flex gap-8 text-sm font-medium">
+                <div className="flex items-center gap-8 text-sm font-medium">
                     <Link to="/" className="text-gray-300 hover:text-white transition">Home</Link>
+                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">Take quiz</Link>
+                    <button
+                            onClick={logoutUser}
+                            className="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition cursor-pointer"
+                        >
+                            Logout
+                        </button>
                 </div>
             </nav>
 
