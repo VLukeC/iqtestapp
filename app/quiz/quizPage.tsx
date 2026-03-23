@@ -11,7 +11,7 @@ export function QuizPage() {
 
     const [ questions, setQuestions ] = useState<Question[]>([]);
 
-    const [ answers, setAnswers ] = useState<String[]>([]);
+    const [ answers, setAnswers ] = useState<string[]>([]);
 
     const [ lengthInputted, setLengthInputted ] = useState(false);
 
@@ -32,6 +32,8 @@ export function QuizPage() {
 
     const startQuiz = (quizLength: number) => {
         setLengthInputted(true);
+        setCurrentIndex(0);
+        setAnswers([]);
 
         fetch(`http://localhost:5000/api/quiz/${quizLength}`)
         .then((results) => results.json())
@@ -100,12 +102,14 @@ export function QuizPage() {
                     {lengthInputted && questions.length > 0 ? (
                         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-lg">
                             <QuizQuestion
+                                key={questions[currentIndex].id ?? currentIndex}
                                 question={questions[currentIndex]}
                                 onNext={nextQuestion}
                                 onPrevious={prevQuestion}
                                 onSubmit={submitQuiz}
                                 hasNext={currentIndex < questions.length - 1}
                                 hasPrevious={currentIndex > 0}
+                                selectedAnswer={answers[currentIndex] ?? ""}
                             />
                         </div>
 
