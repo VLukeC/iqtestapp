@@ -78,19 +78,40 @@ def grade_questions(grade_request: GradeRequest) -> GradeResult:
         )
     summary = "\n\n".join(summary_lines)
 
+    time_taken = grade_request.timeTakenSeconds
+    time_limit = grade_request.timeLimitSeconds
+    time_str = f"{time_taken // 60}m {time_taken % 60}s"
+    limit_str = f"{time_limit // 60}m {time_limit % 60}s"
+
+    if time_limit > 0:
+        percent_time_left = time_taken / time_limit
+        if time_taken >= time_limit:
+            time_context = f"They ran out of time (used all {limit_str})."
+        elif percent_time_left < 0.5:
+            time_context = f"They finished very quickly ({time_str} of {limit_str} allowed), suggesting strong confidence."
+        elif percent_time_left < 0.85:
+            time_context = f"They used {time_str} of the {limit_str} allowed — a reasonable pace."
+        else:
+            time_context = f"They used nearly all the time ({time_str} of {limit_str}), suggesting the questions were challenging."
+    else:
+        time_context = ""
+
     prompt = f"""
     A user just completed an IQ test. Here are their results:
 
     {summary}
 
     Final score: {correct_count} out of {total} correct.
+    {f"Time: {time_context}" if time_context else ""}
 
     Based on this performance:
     1. Estimate an IQ score (integer between 70-145). Use standard distribution:
        85-115 is average, 116-130 is above average, above 130 is exceptional,
-       below 85 is below average.
+       below 85 is below average. Factor in speed — finishing quickly and accurately
+       should score slightly higher; running out of time with errors should score lower.
     2. Write a 2-3 sentence explanation noting specific strengths or weaknesses
-       based on the types of questions they got right or wrong.
+       based on the types of questions they got right or wrong, and briefly mention
+       their use of time if relevant.
     """
 
     response = gemini.models.generate_content(
