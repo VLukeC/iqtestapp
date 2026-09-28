@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import "../styles/styles.css";
 import { StartQuiz } from "./startQuiz";
@@ -11,16 +11,25 @@ export function QuizPage() {
 
     const [ questions, setQuestions ] = useState<Question[]>([]);
 
-    const [ answers, setAnswers ] = useState<String[]>([]);
+    const [ answers, setAnswers ] = useState<string[]>([]);
+
+    const answersRef = useRef<string[]>([]);
 
     const [ lengthInputted, setLengthInputted ] = useState(false);
 
     const [ currentIndex, setCurrentIndex ] = useState(0);
 
+    const [ timeLimitSeconds, setTimeLimitSeconds ] = useState(0);
+
+    const [ timeRemaining, setTimeRemaining ] = useState(0);
+
+    const quizStartTime = useRef<number | null>(null);
+
     const nextQuestion = (selectedQuestion: string) => {
         setAnswers((previousAnswers) => {
             const updatedAnswers = [...previousAnswers];
             updatedAnswers[currentIndex] = selectedQuestion;
+            answersRef.current = updatedAnswers;
             return updatedAnswers;
         });
         setCurrentIndex((previous) => previous + 1);
@@ -30,8 +39,14 @@ export function QuizPage() {
         setCurrentIndex((previous) => previous > 0 ? previous - 1 : 0);
     }
 
-    const startQuiz = (quizLength: number) => {
+    const startQuiz = (quizLength: number, timeLimit: number) => {
         setLengthInputted(true);
+        setCurrentIndex(0);
+        setAnswers([]);
+        answersRef.current = [];
+        setTimeLimitSeconds(timeLimit);
+        setTimeRemaining(timeLimit);
+        quizStartTime.current = null;
 
         fetch(`http://localhost:5000/api/quiz/${quizLength}`)
         .then((results) => results.json())
@@ -39,9 +54,65 @@ export function QuizPage() {
         .catch((error) => console.error("Error obtaining quiz: ", error));
     }
 
+    useEffect(() => {
+        if (questions.length === 0) return;
+
+        // record when quiz starts
+        if (!quizStartTime.current) {
+            quizStartTime.current = Date.now();
+        }
+
+        const interval = setInterval(() => {
+            setTimeRemaining((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    
+                    // auto submit when timer runs out
+                    const timeTaken = quizStartTime.current
+                        ? Math.round((Date.now() - quizStartTime.current) / 1000)
+                        : timeLimitSeconds;
+                    fetch('http://localhost:5000/api/results', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            questions,
+                            userAnswers: questions.map((q, i) => ({
+                                id: i,
+                                selected: answersRef.current[i] ?? ""
+                            })),
+                            timeTakenSeconds: timeTaken,
+                            timeLimitSeconds,
+                        })
+                    })
+                    .then((r) => r.json())
+                    .then((data) => {
+                        navigate('/results', {
+                            state: {
+                                iqScore: data.iqScore,
+                                correctAnswerCount: data.correctAnswerCount,
+                                totalQuestionCount: questions.length,
+                                explanationText: data.explanationText,
+                                timeRanOut: true,
+                            }
+                        });
+                    })
+                    .catch((error) => console.error("Auto-submit error: ", error));
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [questions]);
+
     const submitQuiz = (selectedQuestion: string) => {
         const finalAnswers = [...answers];
         finalAnswers[currentIndex] = selectedQuestion;
+
+        const timeTakenSeconds = quizStartTime.current
+            ? Math.round((Date.now() - quizStartTime.current) / 1000)
+            : timeLimitSeconds;
 
         fetch('http://localhost:5000/api/results', {
             method: 'POST',
@@ -53,7 +124,9 @@ export function QuizPage() {
                 userAnswers: questions.map((question, index) => ({
                     id: index,
                     selected: finalAnswers[index] ?? ""
-                }))
+                })),
+                timeTakenSeconds,
+                timeLimitSeconds,
             })
         })
         .then((results) => results.json())
@@ -98,16 +171,27 @@ export function QuizPage() {
                 <div className="w-full max-w-3xl">
 
                     {lengthInputted && questions.length > 0 ? (
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-lg">
-                            <QuizQuestion
+                        <>
+                            <div className={`text-center text-2xl font-mono font-bold mb-4 transition-colors ${
+                                timeRemaining <= 60 && timeRemaining > 0
+                                    ? "text-red-400 animate-pulse"
+                                    : "text-slate-300"
+                            }`}>
+                                ⏱ {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
+                            </div>
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-lg">
+                                <QuizQuestion
+                                key={questions[currentIndex].id ?? currentIndex}
                                 question={questions[currentIndex]}
                                 onNext={nextQuestion}
                                 onPrevious={prevQuestion}
                                 onSubmit={submitQuiz}
                                 hasNext={currentIndex < questions.length - 1}
                                 hasPrevious={currentIndex > 0}
+                                selectedAnswer={answers[currentIndex] ?? ""}
                             />
                         </div>
+                        </>
 
                     ) : lengthInputted ? (
                         <div className="flex flex-col items-center mt-20 text-slate-400">

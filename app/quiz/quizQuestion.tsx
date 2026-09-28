@@ -1,8 +1,7 @@
 import "../styles/styles.css";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { ChangeEvent } from "react";
-import { useNavigate } from "react-router";
 
 import type {Question} from './Question';
 
@@ -13,12 +12,16 @@ interface QuizQuestionProps {
     onSubmit: (selectedQuestion: string) => void;
     hasNext: boolean;
     hasPrevious: boolean;
+    selectedAnswer: string;
+    isSubmitting: boolean;
 }
 
-export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious, onSubmit}: QuizQuestionProps) {
-    const navigate = useNavigate()
+export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious, onSubmit, selectedAnswer, isSubmitting}: QuizQuestionProps) {
+    const [selectedValue, setSelectedValue] = useState(selectedAnswer);
 
-    const [selectedValue, setSelectedValue] = useState('a');
+    useEffect(() => {
+        setSelectedValue(selectedAnswer);
+    }, [question.id, selectedAnswer]);
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSelectedValue(event.target.value);
@@ -26,6 +29,16 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
 
     const handleNext = () => {
         onNext(selectedValue);
+    }
+
+    const handleSubmit = () => {
+        if (isSubmitting) {
+            return;
+        }
+
+        if (window.confirm("Are you finished with your quiz?")) {
+            onSubmit(selectedValue);
+        }
     }
 
     return (
@@ -37,15 +50,7 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
                 </p>
             </div>
 
-            <form
-                onSubmit={(event) => {
-                    event.preventDefault();
-                    if (window.confirm("Are you finished with your quiz?")) {
-                        onSubmit(selectedValue);
-                    }
-                }}
-                className="space-y-4"
-            >
+            <div className="space-y-4">
                 <p className="text-sm text-slate-400">
                     Select one answer:
                 </p>
@@ -91,23 +96,24 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
                             <button
                                 type="button"
                                 onClick={handleNext}
-                                disabled={!selectedValue}
+                                disabled={!selectedValue || isSubmitting}
                                 className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition disabled:opacity-40"
                             >
                                 Next
                             </button>
                         ) : (
                             <button
-                                type="submit"
-                                disabled={!selectedValue}
+                                type="button"
+                                onClick={handleSubmit}
+                                disabled={!selectedValue || isSubmitting}
                                 className="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 transition disabled:opacity-40"
                             >
-                                Submit Quiz
+                                {isSubmitting ? "Submitting..." : "Submit Quiz"}
                             </button>
                         )}
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
 );
 }

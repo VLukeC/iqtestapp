@@ -9,6 +9,8 @@ export function IndexPage() {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
+        document.title = "IQ Test App";
+
         const session = supabase.auth.getSession();
 
         session.then(({ data }: { data: { session: Session | null } }) => {
@@ -37,10 +39,10 @@ export function IndexPage() {
         navigate("/");
     };
 
-   return (
+    return (
         <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
 
-            
+
             <nav className="flex justify-between items-center px-10 py-5 backdrop-blur-md bg-white/5 border-b border-white/10">
                 <Link to="/" className="text-xl font-bold tracking-wide hover:text-blue-400 transition">
                     IQ Test App
@@ -53,9 +55,9 @@ export function IndexPage() {
                         </Link>
                     )}
 
-                    <Link to="/quiz" className="text-gray-300 hover:text-white transition">
+                    {user && <Link to="/quiz" className="text-gray-300 hover:text-white transition">
                         Take Quiz
-                    </Link>
+                    </Link>}
 
                     {user && (
                         <Link to="/account" className="text-gray-300 hover:text-white transition">
@@ -88,20 +90,20 @@ export function IndexPage() {
 
                 <p className="mt-6 text-lg text-gray-400 max-w-2xl">
                     A smart, AI-powered IQ testing platform that generates unique challenges,
-                    tracks your performance, and helps you improve over time.
+                    tracks your performance, and helps you improve over time. Create an account to begin!
                 </p>
 
                 <div className="flex gap-4 mt-10">
-                    <Link
+                    {user && <Link
                         to="/quiz"
                         className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition font-semibold shadow-lg shadow-blue-600/30"
                     >
                         Start Quiz
-                    </Link>
+                    </Link>}
 
                     {!user && (
                         <Link
-                            to="/login"
+                            to="/signup"
                             className="px-6 py-3 rounded-xl border border-white/20 hover:bg-white/10 transition"
                         >
                             Create Account
