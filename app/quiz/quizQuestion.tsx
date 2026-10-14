@@ -14,9 +14,10 @@ interface QuizQuestionProps {
     hasPrevious: boolean;
     selectedAnswer: string;
     isSubmitting: boolean;
+    onAnswerChange: (answer: string) => void;
 }
 
-export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious, onSubmit, selectedAnswer, isSubmitting}: QuizQuestionProps) {
+export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious, onSubmit, selectedAnswer, isSubmitting, onAnswerChange}: QuizQuestionProps) {
     const [selectedValue, setSelectedValue] = useState(selectedAnswer);
 
     useEffect(() => {
@@ -25,6 +26,7 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
 
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setSelectedValue(event.target.value);
+        onAnswerChange(event.target.value);
     }
 
     const handleNext = () => {
@@ -71,6 +73,7 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
                             value={option}
                             checked={selectedValue === option}
                             onChange={handleChange}
+                            disabled={isSubmitting}
                             className="accent-blue-500"
                         />
                         <span>{option}</span>
@@ -84,6 +87,7 @@ export function QuizQuestion({question, onNext, onPrevious, hasNext, hasPrevious
                             <button
                                 type="button"
                                 onClick={onPrevious}
+                                disabled={isSubmitting}
                                 className="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition"
                             >
                                 Previous

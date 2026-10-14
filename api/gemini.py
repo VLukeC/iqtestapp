@@ -1,6 +1,11 @@
 # gemini.py
 # Created by Aaron on 03/20/2026
+import logging
+import httpx
+from pydantic import ValidationError
 from google import genai
+from google.genai import types
+from google.genai.errors import APIError
 from models import Question, QuestionList, GradeRequest, GradeResult
 
 # valid categories for IQ test questions
@@ -55,7 +60,8 @@ def generate_questions(length: int, category: str = "Mixed") -> QuestionList:
 
 
 def grade_questions(grade_request: GradeRequest) -> GradeResult:
-    gemini = genai.Client()
+    # Keep grading responsive even when the AI service is slow.
+    # HttpOptions timeout is milliseconds; one attempt disables retry delays.
 
     # Build a lookup of user answers by question id
     user_answer_map = {ua.id: ua.selected for ua in grade_request.userAnswers}
@@ -114,16 +120,31 @@ def grade_questions(grade_request: GradeRequest) -> GradeResult:
        their use of time if relevant.
     """
 
-    response = gemini.models.generate_content(
-        model='gemini-2.5-flash',
-        contents=prompt,
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": GradeResult.model_json_schema(),
-        },
-    )
-
-    partial = GradeResult.model_validate_json(response.text)
+    try:
+        with genai.Client(http_options=types.HttpOptions(
+            timeout=8000, retry_options=types.HttpRetryOptions(attempts=1),
+        )) as gemini:
+            response = gemini.models.generate_content(
+                model='gemini-2.5-flash', contents=prompt,
+                config={
+                    "response_mime_type": "application/json",
+                    "response_schema": GradeResult.model_json_schema(),
+                },
+            )
+        partial = GradeResult.model_validate_json(response.text)
+    except (APIError, httpx.HTTPError, ValidationError, ValueError) as error:
+        logging.getLogger(__name__).warning("AI grading unavailable: %s", type(error).__name__)
+        accuracy = correct_count / total if total else 0
+        partial = GradeResult(
+            iqScore=round(70 + 75 * accuracy),
+            correctAnswerCount=correct_count,
+            totalQuestionCount=total,
+            explanationText=(
+                f"You answered {correct_count} of {total} questions correctly. "
+                "AI feedback is currently unavailable, so this score is a basic "
+                "estimate based on accuracy."
+            ),
+        )
 
     return GradeResult(
         iqScore=partial.iqScore,

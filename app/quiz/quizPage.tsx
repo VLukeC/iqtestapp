@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 import "../styles/styles.css";
 import { StartQuiz } from "./startQuiz";
@@ -23,6 +23,10 @@ export function QuizPage() {
     const [ timeLimitSeconds, setTimeLimitSeconds ] = useState(0);
 
     const [ timeRemaining, setTimeRemaining ] = useState(0);
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submissionError, setSubmissionError] = useState("");
+    const submissionStarted = useRef(false);
 
     const quizStartTime = useRef<number | null>(null);
 
@@ -75,98 +79,69 @@ export function QuizPage() {
         });
     }
 
-    useEffect(() => {
-        if (questions.length === 0) return;
-
-        // record when quiz starts
-        if (!quizStartTime.current) {
-            quizStartTime.current = Date.now();
-        }
-
-        const interval = setInterval(() => {
-            setTimeRemaining((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    
-                    // auto submit when timer runs out
-                    const timeTaken = quizStartTime.current
-                        ? Math.round((Date.now() - quizStartTime.current) / 1000)
-                        : timeLimitSeconds;
-                    fetch('/api/results', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            questions,
-                            userAnswers: questions.map((q, i) => ({
-                                id: i,
-                                selected: answersRef.current[i] ?? ""
-                            })),
-                            timeTakenSeconds: timeTaken,
-                            timeLimitSeconds,
-                        })
-                    })
-                    .then((r) => r.json())
-                    .then((data) => {
-                        navigate('/results', {
-                            state: {
-                                iqScore: data.iqScore,
-                                correctAnswerCount: data.correctAnswerCount,
-                                totalQuestionCount: questions.length,
-                                explanationText: data.explanationText,
-                                timeRanOut: true,
-                            }
-                        });
-                    })
-                    .catch((error) => console.error("Auto-submit error: ", error));
-                    return 0;
-                }
-                return prev - 1;
+    const sendResults = useCallback(async (finalAnswers: string[], timeRanOut = false) => {
+        if (submissionStarted.current) return;
+        submissionStarted.current = true;
+        setIsSubmitting(true);
+        setSubmissionError("");
+        const timeTakenSeconds = quizStartTime.current
+            ? Math.round((Date.now() - quizStartTime.current) / 1000) : timeLimitSeconds;
+        try {
+            const response = await fetch('/api/results', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                signal: AbortSignal.timeout(20000),
+                body: JSON.stringify({
+                    questions,
+                    userAnswers: questions.map((question, index) => ({
+                        id: question.id, selected: finalAnswers[index] ?? "",
+                    })),
+                    timeTakenSeconds, timeLimitSeconds,
+                }),
             });
-        }, 1000);
+            if (!response.ok) {
+                const failure = await response.json().catch(() => null);
+                throw new Error(failure?.error ?? "Could not submit your quiz. Please try again.");
+            }
+            const data = await response.json();
+            if (!Number.isFinite(data.iqScore) || !Number.isFinite(data.correctAnswerCount)
+                || typeof data.explanationText !== "string") {
+                throw new Error("The quiz server returned invalid results. Please try again.");
+            }
+            await navigate('/results', {
+                state: { ...data, totalQuestionCount: questions.length, timeRanOut },
+            });
+        } catch (error) {
+            submissionStarted.current = false;
+            setIsSubmitting(false);
+            setSubmissionError(error instanceof Error && error.name === "TimeoutError"
+                ? "Submission timed out. Your answers are still here. Please try again."
+                : error instanceof Error ? error.message : "Could not submit your quiz. Please try again.");
+        }
+    }, [questions, timeLimitSeconds, navigate]);
 
+    useEffect(() => {
+        if (questions.length === 0 || isSubmitting || timeRemaining === 0) return;
+        if (!quizStartTime.current) quizStartTime.current = Date.now();
+        const interval = setInterval(() => {
+            const remaining = Math.max(0, timeLimitSeconds - Math.floor(
+                (Date.now() - quizStartTime.current!) / 1000));
+            setTimeRemaining(remaining);
+            if (remaining === 0) {
+                clearInterval(interval);
+                void sendResults(answersRef.current, true);
+            }
+        }, 1000);
         return () => clearInterval(interval);
-    }, [questions]);
+    }, [questions, timeLimitSeconds, isSubmitting, sendResults, timeRemaining === 0]);
 
     const submitQuiz = (selectedQuestion: string) => {
-        const finalAnswers = [...answers];
+        const finalAnswers = [...answersRef.current];
         finalAnswers[currentIndex] = selectedQuestion;
-
-        const timeTakenSeconds = quizStartTime.current
-            ? Math.round((Date.now() - quizStartTime.current) / 1000)
-            : timeLimitSeconds;
-
-        fetch('/api/results', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                questions: questions,
-                userAnswers: questions.map((question, index) => ({
-                    id: index,
-                    selected: finalAnswers[index] ?? ""
-                })),
-                timeTakenSeconds,
-                timeLimitSeconds,
-            })
-        })
-        .then((results) => results.json())
-        .then((data) => {
-            const iqScore = data.iqScore;
-            const correctAnswerCount = data.correctAnswerCount;
-            const totalQuestionCount = questions.length;
-            const explanationText = data.explanationText;
-            navigate('/results', {
-                state: {
-                    iqScore,
-                    correctAnswerCount,
-                    totalQuestionCount,
-                    explanationText
-                }
-            });
-        })
-        .catch((error) => console.error("Error obtaining results: ", error));
-    }
+        answersRef.current = finalAnswers;
+        setAnswers(finalAnswers);
+        void sendResults(finalAnswers, timeRemaining === 0);
+    };
 
     return (
         <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
@@ -203,6 +178,13 @@ export function QuizPage() {
                             }`}>
                                 ⏱ {Math.floor(timeRemaining / 60)}:{String(timeRemaining % 60).padStart(2, '0')}
                             </div>
+                            {isSubmitting && <p role="status" className="text-center text-slate-300 mb-4">Submitting your quiz and preparing results...</p>}
+                            {submissionError && (
+                                <div role="alert" className="text-center text-red-400 mb-4">
+                                    <p>{submissionError}</p>
+                                    <button type="button" className="mt-2 underline" onClick={() => void sendResults(answersRef.current, timeRemaining === 0)}>Retry submission</button>
+                                </div>
+                            )}
                             <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 shadow-lg">
                                 <QuizQuestion
                                 key={questions[currentIndex].id ?? currentIndex}
@@ -210,6 +192,13 @@ export function QuizPage() {
                                 onNext={nextQuestion}
                                 onPrevious={prevQuestion}
                                 onSubmit={submitQuiz}
+                                isSubmitting={isSubmitting || timeRemaining === 0}
+                                onAnswerChange={(answer) => {
+                                    const updated = [...answersRef.current];
+                                    updated[currentIndex] = answer;
+                                    answersRef.current = updated;
+                                    setAnswers(updated);
+                                }}
                                 hasNext={currentIndex < questions.length - 1}
                                 hasPrevious={currentIndex > 0}
                                 selectedAnswer={answers[currentIndex] ?? ""}

@@ -140,6 +140,8 @@ def main():
             VALID_EMAIL,
             VALID_PASSWORD,
         )
+
+    
     
     finally:
         driver.quit()
