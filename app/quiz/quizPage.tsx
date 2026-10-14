@@ -16,6 +16,7 @@ export function QuizPage() {
     const answersRef = useRef<string[]>([]);
 
     const [ lengthInputted, setLengthInputted ] = useState(false);
+    const [ generationError, setGenerationError ] = useState("");
 
     const [ currentIndex, setCurrentIndex ] = useState(0);
 
@@ -40,6 +41,8 @@ export function QuizPage() {
     }
 
     const startQuiz = (quizLength: number, timeLimit: number) => {
+        setGenerationError("");
+        setQuestions([]);
         setLengthInputted(true);
         setCurrentIndex(0);
         setAnswers([]);
@@ -48,10 +51,28 @@ export function QuizPage() {
         setTimeRemaining(timeLimit);
         quizStartTime.current = null;
 
-        fetch(`http://localhost:5000/api/quiz/${quizLength}`)
-        .then((results) => results.json())
-        .then((data) => setQuestions(data.questionList))
-        .catch((error) => console.error("Error obtaining quiz: ", error));
+        fetch(`/api/quiz/${quizLength}`, {
+            signal: AbortSignal.timeout(90000),
+        })
+        .then(async (results) => {
+            if (!results.ok) {
+                const failure = await results.json().catch(() => null);
+                throw new Error(failure?.error ?? "Quiz generation failed. Please try again.");
+            }
+            const data = await results.json();
+            if (!Array.isArray(data.questionList) || data.questionList.length === 0) {
+                throw new Error("No questions were returned. Please try again.");
+            }
+            setQuestions(data.questionList);
+        })
+        .catch((error) => {
+            setGenerationError(error.name === "TimeoutError"
+                ? "Quiz generation timed out. Try again with fewer questions."
+                : error instanceof TypeError
+                    ? "Cannot reach the quiz server. Make sure the backend is running on port 5000."
+                    : error.message);
+            setLengthInputted(false);
+        });
     }
 
     useEffect(() => {
@@ -71,7 +92,7 @@ export function QuizPage() {
                     const timeTaken = quizStartTime.current
                         ? Math.round((Date.now() - quizStartTime.current) / 1000)
                         : timeLimitSeconds;
-                    fetch('http://localhost:5000/api/results', {
+                    fetch('/api/results', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -114,7 +135,7 @@ export function QuizPage() {
             ? Math.round((Date.now() - quizStartTime.current) / 1000)
             : timeLimitSeconds;
 
-        fetch('http://localhost:5000/api/results', {
+        fetch('/api/results', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -169,6 +190,9 @@ export function QuizPage() {
 
             <div className="flex justify-center mt-16 px-4">
                 <div className="w-full max-w-3xl">
+                    {generationError && (
+                        <p role="alert" className="text-center text-red-400 mb-6">{generationError}</p>
+                    )}
 
                     {lengthInputted && questions.length > 0 ? (
                         <>

@@ -16,6 +16,34 @@ A modern, production-ready template for building full-stack React applications u
 
 ## Getting Started
 
+### Restored local Supabase
+
+The downloaded database has been restored into the Docker volume for `iqtestapp`.
+Start Docker Desktop, then run:
+
+```bash
+npx --yes supabase start -x logflare,vector,realtime
+npm run dev
+```
+
+Quiz generation also requires the Python backend in a separate terminal:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r api/requirements.txt
+.\.venv\Scripts\python.exe api/api.py
+```
+
+The backend listens on port 5000 and uses `GEMINI_API_KEY` from `.env`.
+
+The app uses the local Supabase settings in `.env`. Studio is available at
+http://127.0.0.1:54323 and local password-reset emails at http://127.0.0.1:54324.
+Analytics and Realtime are disabled in this local configuration.
+
+To stop Supabase while preserving the restored data, run `npx --yes supabase stop`.
+Avoid `supabase db reset` and `supabase stop --no-backup`: they can remove restored data.
+Database backup files are excluded from Git and the app's file watcher.
+
 ### Installation
 
 Install the dependencies:

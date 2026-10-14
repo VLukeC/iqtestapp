@@ -8,3 +8,7 @@
 /build/
 api/__pycache__/gemini.cpython-313.pyc
 api/__pycache__/models.cpython-313.pyc
+
+# Local database backups
+*.backup
+*.backup.gz

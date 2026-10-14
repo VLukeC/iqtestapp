@@ -4,11 +4,22 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from models import GradeRequest
 from gemini import generate_questions, grade_questions, VALID_CATEGORIES
+from google.genai.errors import APIError
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.errorhandler(APIError)
+def handle_generation_error(error):
+    if error.code == 503:
+        return jsonify(error="The AI quiz service is busy. Please try again in a moment."), 503
+    if error.code == 429:
+        return jsonify(error="The AI quiz service has reached its request limit. Please try again later."), 429
+    app.logger.error("AI service request failed with status %s", error.code)
+    return jsonify(error="The AI quiz service could not complete the request. Please try again."), 502
 
 
 @app.route('/api/quiz/<int:length>', methods=['GET'])
