@@ -39,7 +39,7 @@ export function StartQuiz({ handleSubmit }: StartQuizProps) {
                 const message = preferencesError instanceof Error
                     ? preferencesError.message
                     : "Failed to load user preferences.";
-                alert(message);
+                
             }
             finally {
                 setPreferencesLoading(false);

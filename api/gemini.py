@@ -48,7 +48,7 @@ def generate_questions(length: int, category: str = "Mixed") -> QuestionList:
     """
 
     response = gemini.models.generate_content(
-        model='gemini-2.5-flash',
+        model='gemini-3.8-flash',
         contents=prompt,
         config={
             "response_mime_type": "application/json",
@@ -125,7 +125,7 @@ def grade_questions(grade_request: GradeRequest) -> GradeResult:
             timeout=8000, retry_options=types.HttpRetryOptions(attempts=1),
         )) as gemini:
             response = gemini.models.generate_content(
-                model='gemini-2.5-flash', contents=prompt,
+                model='gemini-3.8-flash', contents=prompt,
                 config={
                     "response_mime_type": "application/json",
                     "response_schema": GradeResult.model_json_schema(),
