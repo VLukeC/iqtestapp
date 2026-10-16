@@ -134,8 +134,7 @@ def wait_for_signup_result(driver):
         for error in browser.find_elements(By.CSS_SELECTOR, "div.text-red-300"):
             if error.is_displayed() and error.text.strip():
                 return ("error", error.text.strip())
-        # With email confirmation enabled, signup redirects to login.
-        # Without confirmation, LoginPage redirects the new session home.
+
         path = urlparse(browser.current_url).path.rstrip("/")
         if path == "/login":
             return ("success", "")
@@ -163,6 +162,7 @@ def test_valid_signup(driver, email, password):
     result, message = wait_for_signup_result(driver)
     if result != "success":
         raise AssertionError(f"Valid signup was rejected: {message}")
+    
 
 
 def main():

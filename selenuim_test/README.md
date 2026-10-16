@@ -22,3 +22,13 @@ Optional environment variables:
 - `TEST_WAIT_SECONDS`: defaults to `20`.
 
 The script preserves the original random invalid-password cases and adds missing-email login and six signup validation cases. It prints PASS/FAIL/SKIP per case, returns a nonzero exit code on failure, and closes Chrome after the suite finishes. Live authentication errors such as service outages or rate limits count as failures, rather than valid credential rejections.
+
+
+
+
+npx --yes supabase start -x logflare,vector,realtime
+
+.\.venv\Scripts\python.exe api/api.py
+
+
+npm run dev
