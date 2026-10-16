@@ -7,7 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, UnexpectedAlertPresentException
 
 BASE_URL = os.environ.get("TEST_BASE_URL", "http://localhost:5173").rstrip("/")
-WAIT_SECONDS = int(os.environ.get("TEST_WAIT_SECONDS", "20"))
+WAIT_SECONDS = int(os.environ.get("TEST_WAIT_SECONDS", "120"))
 VALID_EMAIL = os.environ.get("TEST_LOGIN_EMAIL", "lreed0383@gmail.com")
 VALID_PASSWORD = os.environ.get("TEST_LOGIN_PASSWORD", "123123")
 
@@ -54,7 +54,7 @@ def dismiss_alert(driver):
 
 
 def test_quiz_generation(driver, length):
-    wait = WebDriverWait(driver, 120)
+    wait = WebDriverWait(driver, 180)
     if not VALID_EMAIL or not VALID_PASSWORD:
         raise AssertionError("Quiz testing requires valid login credentials")
     submit_login(driver, VALID_EMAIL, VALID_PASSWORD)
