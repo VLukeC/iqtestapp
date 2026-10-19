@@ -2,6 +2,8 @@
 .env
 /node_modules/
 .venv/
+/.tools/
+**/__pycache__/
 
 # React Router
 /.react-router/

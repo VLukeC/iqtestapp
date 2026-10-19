@@ -50,8 +50,7 @@ export default function LoginPage() {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:5173/reset-password",
-      // TODO: Change URL to real hosting
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {

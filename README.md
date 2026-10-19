@@ -18,11 +18,11 @@ A modern, production-ready template for building full-stack React applications u
 
 ### Restored local Supabase
 
-The downloaded database has been restored into the Docker volume for `iqtestapp`.
-Start Docker Desktop, then run:
+The original database and storage volumes have been migrated to Ubuntu Docker
+for `iqtestapp`. Run these commands in Ubuntu from the project root:
 
 ```bash
-npx --yes supabase start -x logflare,vector,realtime
+./.tools/supabase start -x logflare,vector,realtime
 npm run dev
 ```
 
@@ -40,7 +40,7 @@ The app uses the local Supabase settings in `.env`. Studio is available at
 http://127.0.0.1:54323 and local password-reset emails at http://127.0.0.1:54324.
 Analytics and Realtime are disabled in this local configuration.
 
-To stop Supabase while preserving the restored data, run `npx --yes supabase stop`.
+To stop Supabase while preserving the restored data, run `./.tools/supabase stop`.
 Avoid `supabase db reset` and `supabase stop --no-backup`: they can remove restored data.
 Database backup files are excluded from Git and the app's file watcher.
 
@@ -74,38 +74,33 @@ npm run build
 
 ### Docker Deployment
 
-Start Docker, then run from the project root (in Ubuntu/WSL, use
-`cd /mnt/c/Users/Sam/OneDrive/Desktop/iqtestapp`):
+Run the full app from the project folder in Ubuntu with one command:
 
 ```bash
-sudo docker compose up --build -d
+sudo sh docker/start.sh
 ```
 
-Open http://localhost:3000. Compose builds and starts the React frontend and
-Python API, plus an Nginx gateway that forwards `/api/` requests to Flask.
-The Python API starts automatically using Gunicorn.
+Open http://localhost:3000. The launcher starts the migrated original Supabase
+project first, then builds and starts React, Flask, and Nginx with Compose.
+Existing accounts and quiz history remain in the original migrated volumes.
+Docker Desktop is not needed. The launcher uses the Linux Supabase CLI already
+installed in the ignored `.tools/supabase` file. It also handles stale Docker
+Desktop plugin links by using Ubuntu's installed native Compose/Buildx plugins.
 
-The project-root `.env` must contain `VITE_SUPABASE_URL`,
-`VITE_SUPABASE_ANON_KEY`, and `GEMINI_API_KEY`. Only the public Supabase
-settings are embedded in the frontend build; the Gemini key is passed to
-the API at runtime. Rebuild after changing the Supabase settings.
-Environment files, local dependencies, and database backups are excluded
-from the build context.
+Keep `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `GEMINI_API_KEY` in `.env`.
+The browser uses same-origin `/supabase/` requests forwarded by the app gateway.
+For startup failures, check `.tools/supabase-start.log` and
+`sudo docker compose logs`. The Supabase log may contain local credentials;
+keep it out of version control.
 
-Supabase remains a separate service: start your existing local Supabase
-with the command above, or use a hosted Supabase project. The Supabase URL
-must be reachable from your browser. This Compose setup does not start or
-migrate the existing database. If login redirects should return to this
-Docker app, configure the auth redirect URL for port 3000; the current
-password-reset flow uses port 5173.
-
-If an older container is using port 3000, stop it before starting Compose.
-To inspect logs or stop this app:
+Stop the full app and Supabase with:
 
 ```bash
-sudo docker compose logs -f
-sudo docker compose down
+sudo sh docker/stop.sh
 ```
+
+Both scripts preserve database volumes. Avoid Supabase reset or
+`supabase stop --no-backup` commands, which can remove restored data.
 
 The containerized application can be deployed to any platform that supports Docker, including:
 

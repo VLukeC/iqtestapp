@@ -8,6 +8,7 @@ COPY react-router.config.ts vite.config.ts tsconfig.json ./
 # Public settings embedded by Vite; secrets are supplied only to the API at runtime.
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_SUPABASE_SAME_ORIGIN=false
 RUN npm run build
 
 FROM node:22-alpine AS production-dependencies

@@ -1,6 +1,7 @@
 # gemini.py
 # Created by Aaron on 03/20/2026
 import logging
+from concurrent.futures import ThreadPoolExecutor
 import httpx
 from pydantic import ValidationError
 from google import genai
@@ -20,7 +21,20 @@ VALID_CATEGORIES = [
 
 
 def generate_questions(length: int, category: str = "Mixed") -> QuestionList:
-    gemini = genai.Client()
+    if not 1 <= length <= 50:
+        raise ValueError("Quiz length must be between 1 and 50")
+    sizes = [min(5, length - offset) for offset in range(0, length, 5)]
+    with ThreadPoolExecutor(max_workers=len(sizes)) as executor:
+        batches = list(executor.map(
+            lambda size: _generate_question_batch(size, category), sizes,
+        ))
+    questions = [question for batch in batches for question in batch.questionList]
+    for index, question in enumerate(questions):
+        question.id = index
+    return QuestionList(questionList=questions)
+
+
+def _generate_question_batch(length: int, category: str) -> QuestionList:
 
     # If Mixed, use all categories, otherwise focus on the selected one
     if category == "Mixed":
@@ -47,16 +61,37 @@ def generate_questions(length: int, category: str = "Mixed") -> QuestionList:
     text-based logic puzzles).
     """
 
-    response = gemini.models.generate_content(
-        model='gemini-3.8-flash',
-        contents=prompt,
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": QuestionList.model_json_schema(),
-        },
-    )
+    # Bound both attempts below the browser and server deadlines.
+    for model in ("gemini-3.8-flash", "gemini-2.5-flash"):
+        try:
+            with genai.Client(http_options=types.HttpOptions(
+                timeout=30000, retry_options=types.HttpRetryOptions(attempts=1),
+            )) as gemini:
+                response = gemini.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config={
+                        "thinking_config": (types.ThinkingConfig(thinking_budget=0)
+                                            if model == "gemini-2.5-flash"
+                                            else types.ThinkingConfig(thinking_level="LOW")),
+                        "response_mime_type": "application/json",
+                        "response_schema": QuestionList.model_json_schema(),
+                    },
+                )
+            break
+        except (APIError, httpx.RequestError) as error:
+            if isinstance(error, APIError) and error.code not in (408, 429, 500, 502, 503, 504):
+                raise
+            if model == "gemini-2.5-flash":
+                raise
+            logging.getLogger(__name__).warning(
+                "Quiz model unavailable (%s); trying fallback", model,
+            )
 
-    return QuestionList.model_validate_json(response.text)
+    result = QuestionList.model_validate_json(response.text)
+    if len(result.questionList) != length:
+        raise ValueError("The AI returned an incomplete question batch")
+    return result
 
 
 def grade_questions(grade_request: GradeRequest) -> GradeResult:
