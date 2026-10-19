@@ -2,3 +2,15 @@
 build
 node_modules
 README.md
+.git
+.env
+.env.*
+.venv
+**/__pycache__
+**/*.pyc
+*.backup
+*.backup.gz
+*.mp4
+supabase
+selenuim_test
+tests

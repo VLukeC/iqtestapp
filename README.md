@@ -74,13 +74,37 @@ npm run build
 
 ### Docker Deployment
 
-To build and run using Docker:
+Start Docker, then run from the project root (in Ubuntu/WSL, use
+`cd /mnt/c/Users/Sam/OneDrive/Desktop/iqtestapp`):
 
 ```bash
-docker build -t my-app .
+sudo docker compose up --build -d
+```
 
-# Run the container
-docker run -p 3000:3000 my-app
+Open http://localhost:3000. Compose builds and starts the React frontend and
+Python API, plus an Nginx gateway that forwards `/api/` requests to Flask.
+The Python API starts automatically using Gunicorn.
+
+The project-root `.env` must contain `VITE_SUPABASE_URL`,
+`VITE_SUPABASE_ANON_KEY`, and `GEMINI_API_KEY`. Only the public Supabase
+settings are embedded in the frontend build; the Gemini key is passed to
+the API at runtime. Rebuild after changing the Supabase settings.
+Environment files, local dependencies, and database backups are excluded
+from the build context.
+
+Supabase remains a separate service: start your existing local Supabase
+with the command above, or use a hosted Supabase project. The Supabase URL
+must be reachable from your browser. This Compose setup does not start or
+migrate the existing database. If login redirects should return to this
+Docker app, configure the auth redirect URL for port 3000; the current
+password-reset flow uses port 5173.
+
+If an older container is using port 3000, stop it before starting Compose.
+To inspect logs or stop this app:
+
+```bash
+sudo docker compose logs -f
+sudo docker compose down
 ```
 
 The containerized application can be deployed to any platform that supports Docker, including:

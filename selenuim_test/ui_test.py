@@ -163,7 +163,9 @@ def test_valid_signup(driver, email, password):
     if result != "success":
         raise AssertionError(f"Valid signup was rejected: {message}")
     
-
+def setting_test(driver, email, password):
+    test_valid_login(driver, email, password)
+    #http://localhost:5173/account
 
 def main():
     if bool(VALID_EMAIL) != bool(VALID_PASSWORD):
